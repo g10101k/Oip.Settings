@@ -15,13 +15,10 @@ namespace Oip.Settings;
 /// <typeparam name="TAppSettings"></typeparam>
 public class BaseAppSettings<TAppSettings> : IAppSettings where TAppSettings : class, IAppSettings
 {
+    private static object _lockObject = new object();
     private static TAppSettings? _instance;
     private static TAppSettings? _tmpInstance;
-
-    // ReSharper disable once StaticMemberInGenericType
-#pragma warning disable S2743
-    internal static AppSettingsOptions? _appSettingsOptions;
-#pragma warning restore S2743
+    private static AppSettingsOptions? _appSettingsOptions;
 
     /// <summary>
     /// Singleton application settings
@@ -33,14 +30,17 @@ public class BaseAppSettings<TAppSettings> : IAppSettings where TAppSettings : c
         {
             if (_instance != null)
                 return _instance;
-            _instance = (TAppSettings)(Activator.CreateInstance(typeof(TAppSettings)) ??
-                                       throw new InvalidOperationException());
-            _tmpInstance = (TAppSettings)(Activator.CreateInstance(typeof(TAppSettings)) ??
-                                          throw new InvalidOperationException());
-            BindTemporaryConfiguration(_tmpInstance);
-            BindMainConfiguration(_instance, _tmpInstance);
+            lock (_lockObject)
+            {
+                _instance = (TAppSettings)(Activator.CreateInstance(typeof(TAppSettings)) ??
+                                           throw new InvalidOperationException());
+                _tmpInstance = (TAppSettings)(Activator.CreateInstance(typeof(TAppSettings)) ??
+                                              throw new InvalidOperationException());
+                BindTemporaryConfiguration(_tmpInstance);
+                BindMainConfiguration(_instance, _tmpInstance);
 
-            return _instance;
+                return _instance;
+            }
         }
     }
 
