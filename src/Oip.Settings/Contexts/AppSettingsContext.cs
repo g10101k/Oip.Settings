@@ -1,21 +1,20 @@
 using Microsoft.EntityFrameworkCore;
 using Oip.Settings.Entities;
 using Oip.Settings.EntityConfigurations;
-
 namespace Oip.Settings.Contexts;
 
 /// <summary>
-/// Data context
+/// Database context for application settings
 /// </summary>
 public class AppSettingsContext : DbContext
 {
     private readonly AppSettingsOptions _appSettingsOptions;
 
     /// <summary>
-    /// .ctor
+    /// Initializes a new instance of the AppSettingsContext
     /// </summary>
-    /// <param name="options"></param>
-    /// <param name="appSettingsOptions"></param>
+    /// <param name="options">The options for this context</param>
+    /// <param name="appSettingsOptions">Configuration options for application settings</param>
     public AppSettingsContext(DbContextOptions<AppSettingsContext> options, AppSettingsOptions appSettingsOptions) :
         base(options)
     {
@@ -36,8 +35,10 @@ public class AppSettingsContext : DbContext
             _appSettingsOptions.AppSettingsSchema));
     }
 
-
-    public void Migrate()
+    /// <summary>
+    /// Creates the database schema and tables if they don't exist
+    /// </summary>
+    public void CreateTablesIfNotExist()
     {
         string sqlFormat;
         string sql;
@@ -49,7 +50,6 @@ public class AppSettingsContext : DbContext
                             Key   TEXT not null constraint PK_AppSetting primary key,
                             Value TEXT not null
                         );
-
                         """;
             sql = string.Format(sqlFormat, _appSettingsOptions.AppSettingsTable);
             Database.ExecuteSqlRaw(sql);
@@ -59,14 +59,11 @@ public class AppSettingsContext : DbContext
             sqlFormat = """
                         BEGIN TRY
                             BEGIN TRANSACTION
-                            
-                            -- Проверка и создание схемы
                             IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = '{0}')
                             BEGIN
                                 EXEC('CREATE SCHEMA [{0}]')
                             END
                             
-                            -- Проверка и создание таблицы
                             IF OBJECT_ID('[{0}].[{1}]', 'U') IS NULL
                             BEGIN
                                 CREATE TABLE [{0}].[{1}]
@@ -83,7 +80,6 @@ public class AppSettingsContext : DbContext
                             THROW
                         END CATCH
                         """;
-
             sql = string.Format(sqlFormat, _appSettingsOptions.AppSettingsSchema,
                 _appSettingsOptions.AppSettingsTable);
             Database.ExecuteSqlRaw(sql);
