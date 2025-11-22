@@ -3,15 +3,24 @@ using Oip.Settings.Tests.Settings;
 
 namespace Oip.Settings.Tests;
 
+/// <summary>
+/// Test fixture for JSON application settings functionality
+/// </summary>
 [TestFixture]
-public class JsonAppSettingsTests: BaseSettingsTest
+public class JsonAppSettingsTests : BaseSettingsTest
 {
+    /// <summary>
+    /// Set up test environment before each test
+    /// </summary>
     [SetUp]
     public void SetUp()
     {
         JsonTestAppSettings.Initialize();
     }
 
+    /// <summary>
+    /// Test base settings functionality through the instance
+    /// </summary>
     [Test]
     public void Instance_TestIBaseSettings()
     {
@@ -19,8 +28,7 @@ public class JsonAppSettingsTests: BaseSettingsTest
     }
 
     /// <summary>
-    /// Test the singleton behavior of the Instance property.
-    /// Ensures that multiple calls return the same instance.
+    /// Test the singleton behavior of the Instance property
     /// </summary>
     [Test]
     public void Instance_ShouldReturnSameInstance_WhenAccessedMultipleTimes()
@@ -30,25 +38,22 @@ public class JsonAppSettingsTests: BaseSettingsTest
         var secondInstance = JsonTestAppSettings.Instance;
 
         // Assert
-        Assert.That(firstInstance, Is.SameAs(secondInstance)); // Assert that both references point to the same instance
+        Assert.That(firstInstance, Is.SameAs(secondInstance));
     }
 
     /// <summary>
-    /// Test configuration binding.
-    /// Verifies that configuration values are correctly bound to the instance.
+    /// Test configuration binding
     /// </summary>
     [Test]
     public void BindConfig_ShouldBindCorrectly()
     {
         var settings = JsonTestAppSettings.Instance;
-
         Assert.That(settings.ConnectionString, Is.Null);
         Assert.That(settings.NormalizedConnectionString, Is.Null);
     }
 
     /// <summary>
-    /// Test connection string normalization.
-    /// Verifies that the normalization logic works correctly when enabled.
+    /// Test connection string normalization
     /// </summary>
     [Test]
     public void NormalizeConnectionString_ShouldNormalizeCorrectly_WhenFlagIsTrue()
@@ -62,8 +67,7 @@ public class JsonAppSettingsTests: BaseSettingsTest
     }
 
     /// <summary>
-    /// Test the Initialize method with parameters.
-    /// Verifies that all properties are correctly set when provided via parameters.
+    /// Test the Initialize method with parameters
     /// </summary>
     [Test]
     public void Initialize_WithParameters_ShouldSetOptionsCorrectly()
@@ -84,8 +88,7 @@ public class JsonAppSettingsTests: BaseSettingsTest
     }
 
     /// <summary>
-    /// Test that the singleton instance is created even when Initialize is not called.
-    /// Ensures that the Instance property will automatically initialize the settings.
+    /// Test that the singleton instance is created even when Initialize is not called
     /// </summary>
     [Test]
     public void Instance_ShouldCreateInstanceEvenIfNotInitializedExplicitly()
@@ -94,7 +97,7 @@ public class JsonAppSettingsTests: BaseSettingsTest
         var instance = JsonTestAppSettings.Instance;
 
         // Assert
-        Assert.That(instance, Is.Not.Null); // Ensure the instance is created
+        Assert.That(instance, Is.Not.Null);
     }
 
     /// <summary>
@@ -102,34 +105,22 @@ public class JsonAppSettingsTests: BaseSettingsTest
     /// </summary>
     private class JsonTestAppSettings : BaseAppSettings<JsonTestAppSettings>, IBaseSettings
     {
-        /// <summary>
-        /// Test integer property
-        /// </summary>
+        /// <inheritdoc />
         public int TestInt { get; set; }
-        
-        /// <summary>
-        /// Test double property
-        /// </summary>
+
+        /// <inheritdoc />
         public double TestDouble { get; set; }
-        
-        /// <summary>
-        /// Test string property
-        /// </summary>
+
+        /// <inheritdoc />
         public string TestString { get; set; } = null!;
-        
-        /// <summary>
-        /// Test string list property
-        /// </summary>
+
+        /// <inheritdoc />
         public List<string> TestStringList { get; set; }
-        
-        /// <summary>
-        /// Test object list property
-        /// </summary>
+
+        /// <inheritdoc />
         public List<BaseTestSetting> TestObjectList { get; set; }
-        
-        /// <summary>
-        /// Test dictionary property
-        /// </summary>
+
+        /// <inheritdoc />
         public Dictionary<string, string> TestDictionary { get; set; }
     }
 }
