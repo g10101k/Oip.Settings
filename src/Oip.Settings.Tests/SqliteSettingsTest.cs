@@ -37,11 +37,22 @@ public class SqliteSettingsTest : BaseSettingsTest
 
     private class SqliteServerAppSettings : BaseAppSettings<SqliteServerAppSettings>, IBaseSettings
     {
+        /// <inheritdoc />
         public int TestInt { get; set; }
+
+        /// <inheritdoc />
         public double TestDouble { get; set; }
-        public string TestString { get; set; }
+
+        /// <inheritdoc />
+        public string TestString { get; set; } = null!;
+
+        /// <inheritdoc />
         public List<string> TestStringList { get; set; }
+
+        /// <inheritdoc />
         public List<BaseTestSetting> TestObjectList { get; set; }
+
+        /// <inheritdoc />
         public Dictionary<string, string> TestDictionary { get; set; }
     }
 }
