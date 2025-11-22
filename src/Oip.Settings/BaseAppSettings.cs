@@ -133,7 +133,7 @@ public class BaseAppSettings<TAppSettings> : IAppSettings where TAppSettings : c
                 $"{nameof(_appSettingsOptions)} is null, call {nameof(Initialize)} before use {nameof(Instance)}");
 
         var configurationBuilder = new ConfigurationBuilder();
-        if (instance.AppSettingsOptions.UseEfCoreProvider)
+        if (instance.AppSettingsOptions.UseEfCoreProvider && !string.IsNullOrEmpty(tmp.ConnectionString))
         {
             var efConfigurationSource = new EfConfigurationSource<TAppSettings>(Instance.AppSettingsOptions, tmp);
             configurationBuilder.Add(efConfigurationSource);
@@ -168,6 +168,9 @@ public class BaseAppSettings<TAppSettings> : IAppSettings where TAppSettings : c
 
     internal static void NormalizeConnectionString(TAppSettings instance)
     {
+        if (string.IsNullOrEmpty(instance.ConnectionString))
+            return;
+
         if (!instance.AppSettingsOptions.NormalizeConnectionString)
             return;
         var connectionModel = ConnectionStringHelper.NormalizeConnectionString(instance.ConnectionString);

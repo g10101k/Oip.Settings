@@ -4,12 +4,18 @@ using Oip.Settings.Tests.Settings;
 namespace Oip.Settings.Tests;
 
 [TestFixture]
-public class JsonAppSettingsTests
+public class JsonAppSettingsTests: BaseSettingsTest
 {
     [SetUp]
     public void SetUp()
     {
-        JsonTestAppSettings.Initialize(useEfCoreProvider: false, normalizeConnectionString: true);
+        JsonTestAppSettings.Initialize();
+    }
+
+    [Test]
+    public void Instance_TestIBaseSettings()
+    {
+        TestBaseSettings(JsonTestAppSettings.Instance);
     }
 
     /// <summary>
@@ -36,10 +42,8 @@ public class JsonAppSettingsTests
     {
         var settings = JsonTestAppSettings.Instance;
 
-        Assert.That("XpoProvider=Postgres;Server=localhost;Database=oip-test;uid=postgres;pwd=postgres;",
-            Is.EqualTo(settings.ConnectionString));
-        Assert.That(settings.NormalizedConnectionString,
-            Is.EqualTo("Server=localhost;Database=oip-test;uid=postgres;pwd=postgres;"));
+        Assert.That(settings.ConnectionString, Is.Null);
+        Assert.That(settings.NormalizedConnectionString, Is.Null);
     }
 
     /// <summary>
@@ -53,9 +57,8 @@ public class JsonAppSettingsTests
         var settings = JsonTestAppSettings.Instance;
 
         // Assert
-        Assert.That(XpoProvider.Postgres, Is.EqualTo(settings.Provider));
-        Assert.That(settings.NormalizedConnectionString,
-            Is.EqualTo("Server=localhost;Database=oip-test;uid=postgres;pwd=postgres;"));
+        Assert.That(settings.Provider, Is.EqualTo(XpoProvider.InMemoryDataStore));
+        Assert.That(settings.NormalizedConnectionString, Is.Null);
     }
 
     /// <summary>
@@ -66,7 +69,7 @@ public class JsonAppSettingsTests
     public void Initialize_WithParameters_ShouldSetOptionsCorrectly()
     {
         // Arrange
-        var programArgs = new string[] { "--debug=true", "--env=prod" };
+        var programArgs = new[] { "--debug=true", "--env=prod" };
 
         // Act
         var instance = JsonTestAppSettings.Initialize(programArguments: programArgs,
@@ -95,36 +98,38 @@ public class JsonAppSettingsTests
     }
 
     /// <summary>
-    /// A mock class that simulates application settings for testing.
+    /// Mock application settings class for testing JSON configuration
     /// </summary>
     private class JsonTestAppSettings : BaseAppSettings<JsonTestAppSettings>, IBaseSettings
     {
+        /// <summary>
+        /// Test integer property
+        /// </summary>
         public int TestInt { get; set; }
+        
+        /// <summary>
+        /// Test double property
+        /// </summary>
         public double TestDouble { get; set; }
+        
+        /// <summary>
+        /// Test string property
+        /// </summary>
         public string TestString { get; set; } = null!;
+        
+        /// <summary>
+        /// Test string list property
+        /// </summary>
         public List<string> TestStringList { get; set; }
-        public List<BaseSettingObject> TestObjectList { get; set; }
-        public Dictionary<string, string> TestDictionary { get; set; }
-    }
-
-    private class WithNormalizedAppSettings : BaseAppSettings<WithNormalizedAppSettings>, IBaseSettings
-    {
-        public int TestInt { get; set; }
-        public double TestDouble { get; set; }
-        public string TestString { get; set; }
-        public List<string> TestStringList { get; set; }
-        public List<BaseSettingObject> TestObjectList { get; set; }
-        public Dictionary<string, string> TestDictionary { get; set; }
-    }
-
-    private class SqliteAppSettings : BaseAppSettings<SqliteAppSettings>, IBaseSettings
-    {
-        public int Test { get; set; } = 1;
-        public int TestInt { get; set; }
-        public double TestDouble { get; set; }
-        public string TestString { get; set; }
-        public List<string> TestStringList { get; set; }
-        public List<BaseSettingObject> TestObjectList { get; set; }
+        
+        /// <summary>
+        /// Test object list property
+        /// </summary>
+        public List<BaseTestSetting> TestObjectList { get; set; }
+        
+        /// <summary>
+        /// Test dictionary property
+        /// </summary>
         public Dictionary<string, string> TestDictionary { get; set; }
     }
 }

@@ -98,7 +98,8 @@ public class AppSettingsContext : DbContext
                             "Value" text not null
                         );
                         """;
-            Database.ExecuteSqlRaw(string.Format(sqlFormat, _appSettingsOptions.AppSettingsTable));
+            Database.ExecuteSqlRaw(string.Format(sqlFormat, _appSettingsOptions.AppSettingsSchema,
+                _appSettingsOptions.AppSettingsTable));
         }
     }
 }

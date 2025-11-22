@@ -31,7 +31,7 @@ public class SqlServerSettingsTest
         public double TestDouble { get; set; }
         public string TestString { get; set; }
         public List<string> TestStringList { get; set; }
-        public List<BaseSettingObject> TestObjectList { get; set; }
+        public List<BaseTestSetting> TestObjectList { get; set; }
         public Dictionary<string, string> TestDictionary { get; set; }
     }
 }

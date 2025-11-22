@@ -1,21 +1,42 @@
 namespace Oip.Settings.Tests.Settings;
 
-internal interface IBaseSettings
+/// <summary>
+/// Represents the base interface for settings.
+/// </summary>
+public interface IBaseSettings
 {
+    /// <summary>
+    /// Gets or sets the connection string.
+    /// </summary>
     string ConnectionString { get; set; }
-    int TestInt { get; set; }
-    double TestDouble { get; set; }
-    string TestString { get; set; }
-    List<string> TestStringList { get; set; }
-    List<BaseSettingObject> TestObjectList { get; set; }
-}
 
-internal class BaseSettingObject : IBaseSettings
-{
-    public string ConnectionString { get; set; }
-    public int TestInt { get; set; }
-    public double TestDouble { get; set; }
-    public string TestString { get; set; } = string.Empty;
-    public List<string> TestStringList { get; set; }
-    public List<BaseSettingObject> TestObjectList { get; set; }
+    /// <summary>
+    /// Gets or sets a test integer value.
+    /// </summary>
+    int TestInt { get; set; }
+
+    /// <summary>
+    /// Gets or sets a test double value.
+    /// </summary>
+    double TestDouble { get; set; }
+
+    /// <summary>
+    /// Gets or sets a test string value.
+    /// </summary>
+    string TestString { get; set; }
+
+    /// <summary>
+    /// Gets or sets a list of test strings.
+    /// </summary>
+    List<string> TestStringList { get; set; }
+
+    /// <summary>
+    /// Gets or sets a list of base test settings objects.
+    /// </summary>
+    List<BaseTestSetting> TestObjectList { get; set; }
+
+    /// <summary>
+    /// Gets or sets a dictionary of string keys to string values.
+    /// </summary>
+    Dictionary<string, string> TestDictionary { get; set; }
 }
