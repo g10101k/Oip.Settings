@@ -1,0 +1,36 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oip.Settings", "Oip.Settings\Oip.Settings.csproj", "{D02836BE-B1E7-43D8-90D1-3A9A223DCE27}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oip.Settings.Example", "Oip.Settings.Example\Oip.Settings.Example.csproj", "{FA55734F-6ACE-4D48-AC75-64184FCC2942}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Oip.Settings.Tests", "Oip.Settings.Tests\Oip.Settings.Tests.csproj", "{CE56600D-93FF-4058-A459-D48E4851CE5D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D02836BE-B1E7-43D8-90D1-3A9A223DCE27}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D02836BE-B1E7-43D8-90D1-3A9A223DCE27}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D02836BE-B1E7-43D8-90D1-3A9A223DCE27}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D02836BE-B1E7-43D8-90D1-3A9A223DCE27}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FA55734F-6ACE-4D48-AC75-64184FCC2942}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FA55734F-6ACE-4D48-AC75-64184FCC2942}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FA55734F-6ACE-4D48-AC75-64184FCC2942}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FA55734F-6ACE-4D48-AC75-64184FCC2942}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CE56600D-93FF-4058-A459-D48E4851CE5D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CE56600D-93FF-4058-A459-D48E4851CE5D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CE56600D-93FF-4058-A459-D48E4851CE5D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CE56600D-93FF-4058-A459-D48E4851CE5D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+	EndGlobalSection
+EndGlobal
