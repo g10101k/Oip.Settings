@@ -2,37 +2,38 @@ using Oip.Settings.Tests.Settings;
 
 namespace Oip.Settings.Tests;
 
+/// <summary>
+/// Test fixture for PostgreSQL settings configuration
+/// </summary>
 [TestFixture]
 public class PostgresSettingsTests : BaseSettingsTest
 {
-    [SetUp]
-    public void SetUp()
+    /// <summary>
+    /// Tests that Initialize method correctly sets application settings options
+    /// </summary>
+    [Test]
+    public void Initialize_ShouldSetAppSettingsOptionsCorrectly()
     {
         // Arrange
         var appSettingsOptions = new AppSettingsOptions
         {
             JsonFileName = "appsettings-pg.json",
-            JsonFileNameDevelopment = "appsettings.json" // for add data to database
+            JsonFileNameDevelopment = "appsettings.json" // for adding data to database
         };
 
         // Act
         PostgresSettingsTestsAppSettings.Initialize(appSettingsOptions);
-    }
-
-    [Test]
-    public void Initialize_ShouldSetAppSettingsOptionsCorrectly_()
-    {
         TestBaseSettings(PostgresSettingsTestsAppSettings.Instance);
     }
 
-
     /// <summary>
-    /// Test the Initialize method with AppSettingsOptions.
-    /// Verifies that the settings are correctly initialized.
+    /// Tests the Initialize method with AppSettingsOptions
+    /// Verifies that the settings are correctly initialized
     /// </summary>
     [Test]
-    public void Initialize_ShouldSetAppSettingsOptionsCorrectly()
+    public void Initialize_WithAppSettingsOptions_ShouldSetSettingsCorrectly()
     {
+        // Act
         IBaseSettings instance = PostgresSettingsTestsAppSettings.Initialize(new AppSettingsOptions
         {
             JsonFileName = "appsettings-pg.json",
@@ -42,6 +43,9 @@ public class PostgresSettingsTests : BaseSettingsTest
         TestBaseSettings(instance);
     }
 
+    /// <summary>
+    /// Application settings class for PostgreSQL settings tests
+    /// </summary>
     private class PostgresSettingsTestsAppSettings : BaseAppSettings<PostgresSettingsTestsAppSettings>, IBaseSettings
     {
         /// <inheritdoc />

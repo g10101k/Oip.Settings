@@ -382,7 +382,7 @@ public class FatterTests
     private class WithNullValuesExample
     {
         public string NotNullProperty { get; set; } = "";
-        public string? NullProperty { get; set; }
+        public string NullProperty { get; set; }
     }
 
     private class EmptyCollectionsExample
