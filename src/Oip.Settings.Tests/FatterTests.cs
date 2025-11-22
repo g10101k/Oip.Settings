@@ -411,39 +411,6 @@ public class FatterTests
     }
 
 
-    private class FlatterExample
-    {
-        public int TestInt { get; set; } = 42;
-        public double TestDouble { get; set; } = 2.71828;
-        public string TestString { get; set; } = "Default string value";
-        public List<string> TestStringList { get; set; } = ["first", "second", "third"];
-
-        public List<FlatterExampleWithoutInnerObject> TestObjectList { get; set; } =
-            [new FlatterExampleWithoutInnerObject()];
-
-        public Dictionary<string, string> TestDictionary { get; set; } = new Dictionary<string, string>
-        {
-            ["name"] = "FlatterExample",
-            ["version"] = "1.0",
-            ["status"] = "active"
-        };
-    }
-
-    private class FlatterExampleWithoutInnerObject
-    {
-        public int TestInt { get; set; } = 42;
-        public double TestDouble { get; set; } = 2.71828;
-        public string TestString { get; set; } = "Default string value";
-        public List<string> TestStringList { get; set; } = ["first", "second", "third"];
-
-        public Dictionary<string, string> TestDictionary { get; set; } = new()
-        {
-            ["name"] = "FlatterExample",
-            ["version"] = "1.0",
-            ["status"] = "active"
-        };
-    }
-
     private enum Status
     {
         Active,
