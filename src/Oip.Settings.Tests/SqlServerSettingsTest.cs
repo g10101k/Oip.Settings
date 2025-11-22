@@ -2,6 +2,9 @@ using Oip.Settings.Tests.Settings;
 
 namespace Oip.Settings.Tests;
 
+/// <summary>
+/// Test fixture for SQL Server settings configuration
+/// </summary>
 [TestFixture]
 public class SqlServerSettingsTest : BaseSettingsTest
 {
@@ -18,18 +21,16 @@ public class SqlServerSettingsTest : BaseSettingsTest
             JsonFileName = "appsettings-sql-server.json",
             JsonFileNameDevelopment = "appsettings.json",
         };
-
         // Act
-        var instance = SqliteAppSettings.Initialize(appSettingsOptions);
-
+        var instance = SqlServerAppSettings.Initialize(appSettingsOptions);
         // Assert
         Assert.That(instance, Is.Not.Null);
         TestBaseSettings(instance);
     }
-    
+
     /// <summary>
-    /// Test the Initialize method with AppSettingsOptions.
-    /// Verifies that the settings are correctly initialized.
+    /// Test the Initialize method without development configuration
+    /// Verifies that the settings are correctly initialized when development config is not provided
     /// </summary>
     [Test]
     public void Initialize_WithoutDevelopmentConfig_ShouldLoadSettingsCorrectly()
@@ -39,16 +40,17 @@ public class SqlServerSettingsTest : BaseSettingsTest
         {
             JsonFileName = "appsettings-sql-server.json",
         };
-
         // Act
-        var instance = SqliteAppSettings.Initialize(appSettingsOptions);
-
+        var instance = SqlServerAppSettings.Initialize(appSettingsOptions);
         // Assert
         Assert.That(instance, Is.Not.Null);
         TestBaseSettings(instance);
     }
 
-    private class SqliteAppSettings : BaseAppSettings<SqliteAppSettings>, IBaseSettings
+    /// <summary>
+    /// SQL Server application settings implementation for testing
+    /// </summary>
+    private class SqlServerAppSettings : BaseAppSettings<SqlServerAppSettings>, IBaseSettings
     {
         /// <inheritdoc />
         public int TestInt { get; set; }
