@@ -42,7 +42,7 @@ public class EfConfigurationProvider<TAppSettings> : ConfigurationProvider where
     private void MigrateAndFillData(AppSettingsContext context)
     {
         if (!_appSettingsOptions.ExcludeMigration)
-            context.Migrate();
+            context.CreateTablesIfNotExist();
         CreateAndSaveDefaultValues(context);
         Data = context.AppSettings.ToDictionary(c => c.Key, c => c.Value)!;
     }
