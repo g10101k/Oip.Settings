@@ -29,10 +29,10 @@ public class BaseAppSettings<TAppSettings> : IAppSettings where TAppSettings : c
     {
         get
         {
-            if (_instance != null)
-                return _instance;
             lock (_lockObject)
             {
+                if (_instance != null) return _instance;
+
                 _instance = (TAppSettings)(Activator.CreateInstance(typeof(TAppSettings)) ??
                                            throw new InvalidOperationException(""));
                 _tmpInstance = (TAppSettings)(Activator.CreateInstance(typeof(TAppSettings)) ??
