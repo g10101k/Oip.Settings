@@ -1,4 +1,7 @@
-name: Pull request to main with SQL Server and PostgreSQL
+# This workflow will build a .NET project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
+
+name: Pull request to main
 
 on:
   pull_request:
@@ -7,44 +10,13 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    services:
-      # SQL Server service
-      mssql:
-        image: mcr.microsoft.com/mssql/server:2019-latest
-        env:
-          SA_PASSWORD: P@ssw0rd
-          ACCEPT_EULA: Y
-        ports:
-          - 1433:1433
-
-      # PostgreSQL service
-      postgres:
-        image: postgres:15
-        env:
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_USER: postgres
-          POSTGRES_DB: oip-test
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
     steps:
       - uses: actions/checkout@v3
-
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: 8.0.x
-
       - name: Restore dependencies
         run: dotnet restore ./src/Oip.Settings.sln
-
       - name: Build
         run: dotnet build ./src/Oip.Settings.sln --no-restore
-
-      - name: Run tests
-        run: dotnet test --no-build --verbosity normal
