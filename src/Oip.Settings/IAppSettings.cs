@@ -26,4 +26,9 @@ public interface IAppSettings
     /// Options to config application settings
     /// </summary>
     AppSettingsOptions AppSettingsOptions { get; }
+
+    /// <summary>
+    /// Rebinds the application settings
+    /// </summary>
+    void Rebind();
 }

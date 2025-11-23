@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Oip.Settings.Entities;
 using Oip.Settings.EntityConfigurations;
+
 namespace Oip.Settings.Contexts;
 
 /// <summary>
@@ -8,17 +9,18 @@ namespace Oip.Settings.Contexts;
 /// </summary>
 public class AppSettingsContext : DbContext
 {
+    private readonly IAppSettings _appSettings;
     private readonly AppSettingsOptions _appSettingsOptions;
 
     /// <summary>
     /// Initializes a new instance of the AppSettingsContext
     /// </summary>
-    /// <param name="options">The options for this context</param>
-    /// <param name="appSettingsOptions">Configuration options for application settings</param>
-    public AppSettingsContext(DbContextOptions<AppSettingsContext> options, AppSettingsOptions appSettingsOptions) :
-        base(options)
+    /// <param name="appSettings">Configuration options for application settings</param>
+    public AppSettingsContext(IAppSettings appSettings) : base(
+        appSettings.AppSettingsOptions.Builder(appSettings.Provider, appSettings.NormalizedConnectionString).Options)
     {
-        _appSettingsOptions = appSettingsOptions;
+        _appSettings = appSettings;
+        _appSettingsOptions = appSettings.AppSettingsOptions;
     }
 
     /// <summary>
@@ -98,4 +100,5 @@ public class AppSettingsContext : DbContext
                 _appSettingsOptions.AppSettingsTable));
         }
     }
+
 }

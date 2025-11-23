@@ -10,6 +10,10 @@ namespace Oip.Settings.Tests;
 [TestFixture]
 public class SqliteSettingsTest : BaseSettingsTest
 {
+    private const string TestSettingsFile = "appsettings-sqlite.json";
+    private const string DevelopmentSettingsFile = "appsettings.json";
+    private const int ModifiedTestIntValue = 34;
+
     /// <summary>
     /// Tests SQLite settings initialization with development fallback configuration
     /// </summary>
@@ -19,13 +23,16 @@ public class SqliteSettingsTest : BaseSettingsTest
         // Arrange
         var appSettingsOptions = new AppSettingsOptions
         {
-            JsonFileName = "appsettings-sqlite.json",
-            JsonFileNameDevelopment = "appsettings.json"
+            JsonFileName = TestSettingsFile,
+            JsonFileNameDevelopment = DevelopmentSettingsFile
         };
+
         // Act
         var instance = SqliteAppSettings.Initialize(appSettingsOptions);
+
         // Assert
         TestBaseSettings(instance);
+        Assert.That(instance, Is.Not.Null, "Settings instance should not be null");
     }
 
     /// <summary>
@@ -34,34 +41,56 @@ public class SqliteSettingsTest : BaseSettingsTest
     [Test, Order(2)]
     public void Initialize_WithoutDevelopmentFallback_ShouldLoadSettings()
     {
-        // Act
+        // Arrange & Act
         var instance = SqliteAppSettings.Initialize(new AppSettingsOptions
         {
-            JsonFileName = "appsettings-sqlite.json",
+            JsonFileName = TestSettingsFile,
         });
+
         // Assert
         TestBaseSettings(instance);
+        Assert.That(instance, Is.Not.Null, "Settings instance should not be null");
     }
 
     [Test, Order(3)]
-    public void Initialize_ИзменитьНастройкиБД_ИПеречитатьЗаново()
+    public void Initialize_ChangeDbSettingsAndReload_ShouldReflectChanges()
     {
-        using var context = SqliteAppSettings.GetAppSettingsContext() ?? throw new NullReferenceException();
+        // Arrange
+        using var context = SqliteAppSettings.GetAppSettingsContext();
+        var originalSetting = context.AppSettings.First(x => x.Key == "TestInt");
 
-        context.AppSettings.First(x => x.Key == "TestInt").Value = "34";
+        // Act - Modify setting
+        originalSetting.Value = ModifiedTestIntValue.ToString();
         context.SaveChanges();
 
-        SqliteAppSettings.Rebind();
+        // Act - Reload settings
+        SqliteAppSettings.Instance.Rebind();
 
-        Assert.That(SqliteAppSettings.Instance.TestInt, Is.EqualTo(34));
+        // Assert
+        Assert.That(SqliteAppSettings.Instance.TestInt, Is.EqualTo(ModifiedTestIntValue),
+            "Settings should reflect database changes after reload");
+
+        // Cleanup - Restore original value
+        originalSetting.Value = "0"; // or whatever the original value was
+        context.SaveChanges();
+        SqliteAppSettings.Instance.Rebind();
     }
 
     [OneTimeTearDown]
     public void OneTimeTearDown()
     {
-        using var context = SqliteAppSettings.GetAppSettingsContext() ?? throw new NullReferenceException();
+        CleanupTestData();
+    }
 
-        context.AppSettings.RemoveRange(context.AppSettings);
+    private static void CleanupTestData()
+    {
+        using var context = SqliteAppSettings.GetAppSettingsContext();
+
+        if (context.AppSettings.Any())
+        {
+            context.AppSettings.RemoveRange(context.AppSettings);
+            context.SaveChanges();
+        }
     }
 
     /// <summary>
