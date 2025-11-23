@@ -1,4 +1,3 @@
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Oip.Settings.Contexts;
 using Oip.Settings.Entities;
@@ -10,38 +9,23 @@ namespace Oip.Settings.Providers;
 /// EF Core settings provider
 /// </summary>
 /// <typeparam name="TAppSettings"></typeparam>
-public class EfConfigurationProvider<TAppSettings> : ConfigurationProvider where TAppSettings : class, IAppSettings
+public class EfConfigurationProvider<TAppSettings>(AppSettingsOptions appSettingsOptions, TAppSettings appSettings)
+    : ConfigurationProvider where TAppSettings : class, IAppSettings
 {
-    private readonly AppSettingsOptions _appSettingsOptions;
-    private readonly TAppSettings _settings;
-
-    /// <summary>
-    /// .ctor
-    /// </summary>
-    /// <param name="appSettingsOptions"></param>
-    /// <param name="appSettings"></param>
-    public EfConfigurationProvider(AppSettingsOptions appSettingsOptions, TAppSettings appSettings)
-    {
-        _appSettingsOptions = appSettingsOptions;
-        _settings = appSettings;
-    }
-
     /// <summary>
     /// Load settings
     /// </summary>
     /// <exception cref="ArgumentOutOfRangeException"></exception>
     public override void Load()
     {
-        var builder = new DbContextOptionsBuilder<AppSettingsContext>();
-
-        _appSettingsOptions.Builder(builder, _settings.Provider, _settings.NormalizedConnectionString);
-        using var context = new AppSettingsContext(builder.Options, _appSettingsOptions);
+        var builder = appSettingsOptions.Builder(appSettings.Provider, appSettings.NormalizedConnectionString);
+        using var context = new AppSettingsContext(builder.Options, appSettingsOptions);
         MigrateAndFillData(context);
     }
 
     private void MigrateAndFillData(AppSettingsContext context)
     {
-        if (!_appSettingsOptions.ExcludeMigration)
+        if (!appSettingsOptions.ExcludeMigration)
             context.CreateTablesIfNotExist();
         CreateAndSaveDefaultValues(context);
         Data = context.AppSettings.ToDictionary(c => c.Key, c => c.Value)!;
@@ -53,7 +37,7 @@ public class EfConfigurationProvider<TAppSettings> : ConfigurationProvider where
     /// <param name="dbContext"></param>
     private void CreateAndSaveDefaultValues(AppSettingsContext dbContext)
     {
-        var configValues = Flatter.ToDictionary(_settings);
+        var configValues = Flatter.ToDictionary(appSettings);
         var list = dbContext.AppSettings.ToList();
 
         foreach (var keyValue in configValues)

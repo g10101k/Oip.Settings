@@ -100,6 +100,18 @@ public class JsonAppSettingsTests : BaseSettingsTest
         Assert.That(instance, Is.Not.Null);
     }
 
+    [Test]
+    public void Instance_TestTwoInstances()
+    {
+        var instance = JsonTestAppSettings.Initialize(new AppSettingsOptions());
+        var instance2 = JsonTestAppSettings.Initialize(new AppSettingsOptions()
+        {
+            JsonFileName = "custom.json",
+        });
+
+        Assert.That(instance, Is.EqualTo(instance2));
+    }
+
     /// <summary>
     /// Mock application settings class for testing JSON configuration
     /// </summary>
