@@ -110,7 +110,7 @@ public class AddObjectPropertiesAsSingletonsTests
         public DateTime Date { get; set; } = DateTime.Now;
         public List<string> List { get; set; } = ["a"];
 
-        [DontAddToDependencyInjection]
+        [NotAddToDependencyInjection]
         public DummyApplicationSettingsV2 IgnoredByAttr { get; set; } = new() { Name = "not visible" };
 
         public DummyApplicationSettingsV3 NullComplex { get; set; } = null;

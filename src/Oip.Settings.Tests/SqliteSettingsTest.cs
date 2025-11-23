@@ -51,7 +51,7 @@ public class SqliteSettingsTest : BaseSettingsTest
         context.AppSettings.First(x => x.Key == "TestInt").Value = "34";
         context.SaveChanges();
 
-        SqliteAppSettings.Rebind();
+        SqliteAppSettings.Instance.Rebind();
 
         Assert.That(SqliteAppSettings.Instance.TestInt, Is.EqualTo(34));
     }

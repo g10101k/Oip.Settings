@@ -6,4 +6,4 @@ namespace Oip.Settings.Attributes;
 /// from being added to the service collection.
 /// </summary>
 [AttributeUsage(AttributeTargets.Property)]
-public class DontAddToDependencyInjectionAttribute : Attribute;
+public class NotAddToDependencyInjectionAttribute : Attribute;

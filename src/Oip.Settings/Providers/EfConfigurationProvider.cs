@@ -18,8 +18,7 @@ public class EfConfigurationProvider<TAppSettings>(AppSettingsOptions appSetting
     /// <exception cref="ArgumentOutOfRangeException"></exception>
     public override void Load()
     {
-        var builder = appSettingsOptions.Builder(appSettings.Provider, appSettings.NormalizedConnectionString);
-        using var context = new AppSettingsContext(builder.Options, appSettingsOptions);
+        using var context = new AppSettingsContext(appSettings);
         MigrateAndFillData(context);
     }
 

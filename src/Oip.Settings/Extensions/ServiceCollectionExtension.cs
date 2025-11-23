@@ -18,8 +18,6 @@ public static class ServiceCollectionExtension
     /// </summary>
     public static IServiceCollection AddAppSettingsDbContext(this IServiceCollection services, IAppSettings appSettings)
     {
-        services.AddSingleton(appSettings.AppSettingsOptions);
-
         return services.AddDbContext<AppSettingsContext>(option =>
         {
             switch (appSettings.Provider)
@@ -59,7 +57,7 @@ public static class ServiceCollectionExtension
                 continue;
 
             // Skip properties marked with attribute
-            if (prop.GetCustomAttribute<DontAddToDependencyInjectionAttribute>() != null)
+            if (prop.GetCustomAttribute<NotAddToDependencyInjectionAttribute>() != null)
                 continue;
 
             var value = prop.GetValue(instance);
