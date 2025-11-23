@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Primitives;
 using Oip.Settings.Attributes;
+using Oip.Settings.Contexts;
 using Oip.Settings.Enums;
 using Oip.Settings.Helpers;
 using Oip.Settings.Providers;
@@ -15,7 +16,7 @@ namespace Oip.Settings;
 /// <typeparam name="TAppSettings"></typeparam>
 public class BaseAppSettings<TAppSettings> : IAppSettings where TAppSettings : class, IAppSettings
 {
-    private static object _lockObject = new object();
+    private static object _lockObject = new();
     private static TAppSettings? _instance;
     private static TAppSettings? _tmpInstance;
     private static AppSettingsOptions? _appSettingsOptions;
@@ -33,7 +34,7 @@ public class BaseAppSettings<TAppSettings> : IAppSettings where TAppSettings : c
             lock (_lockObject)
             {
                 _instance = (TAppSettings)(Activator.CreateInstance(typeof(TAppSettings)) ??
-                                           throw new InvalidOperationException());
+                                           throw new InvalidOperationException(""));
                 _tmpInstance = (TAppSettings)(Activator.CreateInstance(typeof(TAppSettings)) ??
                                               throw new InvalidOperationException());
                 BindTemporaryConfiguration(_tmpInstance);
@@ -80,6 +81,16 @@ public class BaseAppSettings<TAppSettings> : IAppSettings where TAppSettings : c
             BindMainConfiguration(_instance, _tmpInstance);
     }
 
+    /// <summary>
+    /// Gets the application settings context.
+    /// </summary>
+    /// <returns>The application settings context.</returns>
+    public static AppSettingsContext GetAppSettingsContext()
+    {
+        var builder = Instance.AppSettingsOptions.Builder(Instance.Provider, Instance.NormalizedConnectionString);
+        return new AppSettingsContext(builder.Options, Instance.AppSettingsOptions);
+    }
+
 #pragma warning disable S107
     /// <summary>
     /// Initialize app settings
@@ -97,7 +108,7 @@ public class BaseAppSettings<TAppSettings> : IAppSettings where TAppSettings : c
         bool? normalizeConnectionString = null, string? jsonFileName = null,
         string? jsonFileNameDevelopment = null,
         string? appSettingsTable = null, string? appSettingsSchema = null,
-        Action<DbContextOptionsBuilder, XpoProvider, string>? builder = null)
+        Func<XpoProvider, string, DbContextOptionsBuilder<AppSettingsContext>>? builder = null)
     {
         _appSettingsOptions = new AppSettingsOptions();
         if (jsonFileName is not null)
@@ -107,7 +118,7 @@ public class BaseAppSettings<TAppSettings> : IAppSettings where TAppSettings : c
         if (programArguments is not null)
             _appSettingsOptions.ProgramArguments = programArguments;
         if (useEfCoreProvider is not null)
-            _appSettingsOptions.UseEfCoreProvider = (bool)useEfCoreProvider;
+            _appSettingsOptions.UseEfCoreProvider = useEfCoreProvider.Value;
         if (appSettingsTable is not null)
             _appSettingsOptions.AppSettingsTable = appSettingsTable;
         if (appSettingsSchema is not null)
@@ -135,7 +146,7 @@ public class BaseAppSettings<TAppSettings> : IAppSettings where TAppSettings : c
         var configurationBuilder = new ConfigurationBuilder();
         if (instance.AppSettingsOptions.UseEfCoreProvider && !string.IsNullOrEmpty(tmp.ConnectionString))
         {
-            var efConfigurationSource = new EfConfigurationSource<TAppSettings>(Instance.AppSettingsOptions, tmp);
+            var efConfigurationSource = new EfConfigurationSource<TAppSettings>(instance.AppSettingsOptions, tmp);
             configurationBuilder.Add(efConfigurationSource);
         }
 
