@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Oip.Settings.Contexts;
 using Oip.Settings.Enums;
 
 namespace Oip.Settings;
@@ -71,26 +72,31 @@ public class AppSettingsOptions
     /// <summary>
     /// DbContextOptionsBuilder
     /// </summary>
-    public Action<DbContextOptionsBuilder, XpoProvider, string> Builder { get; set; } =
-        (option, provider, connection) =>
+    public Func<XpoProvider, string, DbContextOptionsBuilder<AppSettingsContext>> Builder { get; set; } =
+        (provider, connection) =>
         {
+            var optionsBuilder = new DbContextOptionsBuilder<AppSettingsContext>();
+
             switch (provider)
             {
                 case XpoProvider.SQLite:
-                    option.UseSqlite(connection);
+                    optionsBuilder.UseSqlite(connection);
                     break;
                 case XpoProvider.Postgres:
-                    option.UseNpgsql(connection);
+                    optionsBuilder.UseNpgsql(connection);
                     break;
                 case XpoProvider.MSSqlServer:
-                    option.UseSqlServer(connection);
+                    optionsBuilder.UseSqlServer(connection);
                     break;
                 case XpoProvider.InMemoryDataStore:
                 default:
-                    option.UseInMemoryDatabase(connection);
+                    optionsBuilder.UseInMemoryDatabase(connection);
                     break;
             }
+
+            return optionsBuilder;
         };
+
 
     /// <summary>
     /// Use EFCore settings provider, default - true
