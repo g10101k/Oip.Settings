@@ -40,36 +40,6 @@ jobs:
         with:
           dotnet-version: 8.0.x
 
-      - name: Wait for SQL Server to be ready
-        run: |
-          for i in {1..30}; do
-            if /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P "P@ssw0rd" -Q "SELECT 1" &> /dev/null; then
-              echo "SQL Server is ready"
-              break
-            fi
-            echo "Waiting for SQL Server... ($i/30)"
-            sleep 5
-          done
-
-      - name: Wait for PostgreSQL to be ready
-        run: |
-          for i in {1..30}; do
-            if pg_isready -h localhost -p 5432 -U postgres; then
-              echo "PostgreSQL is ready"
-              break
-            fi
-            echo "Waiting for PostgreSQL... ($i/30)"
-            sleep 5
-          done
-
-      - name: Create SQL Server test database
-        run: |
-          /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P "P@ssw0rd" -Q "CREATE DATABASE TestDatabase;"
-
-      - name: Create additional PostgreSQL database
-        run: |
-          PGPASSWORD=postgres psql -h localhost -U postgres -c "CREATE DATABASE test_database_2;"
-
       - name: Restore dependencies
         run: dotnet restore ./src/Oip.Settings.sln
 
