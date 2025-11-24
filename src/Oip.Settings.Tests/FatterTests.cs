@@ -327,7 +327,7 @@ public class FatterTests
             DateTimeOffset = new DateTimeOffset(2023, 12, 31, 23, 59, 59, TimeSpan.Zero),
             TimeSpan = TimeSpan.FromHours(2.5)
         };
-        
+
         var dictionary = Flatter.ToDictionary(instance);
 
 
@@ -341,6 +341,20 @@ public class FatterTests
             Assert.That(dictionary["TimeSpan"], Is.EqualTo(instance.TimeSpan.ToString()));
         });
     }
+
+    [Test]
+    public void ToDictionary_ListToFlatDictionary()
+    {
+        var dictionary = Flatter.ToDictionary(new List<string>() { "1", "2", "3" });
+    }
+
+    [Test]
+    public void ToDictionary_DictionaryToFlatDictionary()
+    {
+        var dictionary = Flatter.ToDictionary(new Dictionary<string, string>()
+            { { "key1", "value1" }, { "key2", "value2" }, });
+    }
+
 
     private class CircularExample
     {

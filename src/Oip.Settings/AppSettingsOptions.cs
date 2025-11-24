@@ -107,4 +107,9 @@ public class AppSettingsOptions
     /// Normalize connection string
     /// </summary>
     public bool NormalizeConnectionString { get; set; } = true;
+
+    /// <summary>
+    /// Indicates whether to use JSON format storage for settings
+    /// </summary>
+    public bool UseJsonStorage { get; set; } = false;
 }

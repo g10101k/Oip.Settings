@@ -196,7 +196,7 @@ public class BaseAppSettings<TAppSettings> : IAppSettings where TAppSettings : c
     {
         if (_appSettingsOptions == null)
         {
-            throw new InvalidOperationException("AppSettingsOptions is not initialized");
+                throw new InvalidOperationException("AppSettingsOptions is not initialized");
         }
 
         return configurationBuilder

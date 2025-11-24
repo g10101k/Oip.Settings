@@ -7,12 +7,19 @@ namespace Oip.Settings.Tests;
 /// <summary>
 /// Test fixture for SQLite settings configuration
 /// </summary>
-[TestFixture]
+[TestFixture(true)]
+[TestFixture(false)]
 public class SqliteSettingsTest : BaseSettingsTest
 {
+    private readonly bool _useJsonStorage;
     private const string TestSettingsFile = "appsettings-sqlite.json";
     private const string DevelopmentSettingsFile = "appsettings.json";
     private const int ModifiedTestIntValue = 34;
+
+    public SqliteSettingsTest(bool useJsonStorage)
+    {
+        _useJsonStorage = useJsonStorage;
+    }
 
     /// <summary>
     /// Tests SQLite settings initialization with development fallback configuration
@@ -24,15 +31,17 @@ public class SqliteSettingsTest : BaseSettingsTest
         var appSettingsOptions = new AppSettingsOptions
         {
             JsonFileName = TestSettingsFile,
-            JsonFileNameDevelopment = DevelopmentSettingsFile
+            JsonFileNameDevelopment = DevelopmentSettingsFile,
+            UseJsonStorage = _useJsonStorage
         };
 
         // Act
         var instance = SqliteAppSettings.Initialize(appSettingsOptions);
 
         // Assert
-        TestBaseSettings(instance);
         Assert.That(instance, Is.Not.Null, "Settings instance should not be null");
+
+        TestBaseSettings(instance);
     }
 
     /// <summary>
@@ -45,6 +54,7 @@ public class SqliteSettingsTest : BaseSettingsTest
         var instance = SqliteAppSettings.Initialize(new AppSettingsOptions
         {
             JsonFileName = TestSettingsFile,
+            UseJsonStorage = _useJsonStorage
         });
 
         // Assert
@@ -69,11 +79,6 @@ public class SqliteSettingsTest : BaseSettingsTest
         // Assert
         Assert.That(SqliteAppSettings.Instance.TestInt, Is.EqualTo(ModifiedTestIntValue),
             "Settings should reflect database changes after reload");
-
-        // Cleanup - Restore original value
-        originalSetting.Value = "0"; // or whatever the original value was
-        context.SaveChanges();
-        SqliteAppSettings.Instance.Rebind();
     }
 
     [OneTimeTearDown]

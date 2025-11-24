@@ -43,7 +43,23 @@ public static class Flatter
 
         try
         {
-            var fields = obj.GetType().GetProperties();
+            var type = obj.GetType();
+            
+            // Handle dictionaries
+            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Dictionary<,>))
+            {
+                DictionaryToDictionary(dictionary, obj, prefix, visitedObjects);
+                return;
+            } 
+            
+            // Handle lists and other collections
+            if (typeof(IEnumerable).IsAssignableFrom(type) && type != typeof(string))
+            {
+                ListToDictionary(dictionary, obj, prefix, visitedObjects);
+                return;
+            }
+
+            var fields = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
             foreach (var field in fields)
             {
                 if (field.GetCustomAttribute(typeof(NotSaveToDbAttribute)) != null)
@@ -52,15 +68,11 @@ public static class Flatter
                 var value = field.GetValue(obj);
                 if (value == null) continue;
 
-                var key = string.IsNullOrEmpty(prefix) ? field.Name : string.Join(':', prefix, field.Name);
+                var key = string.IsNullOrEmpty(prefix) ? field.Name : $"{prefix}:{field.Name}";
 
                 if (IsSimpleOrNull(value))
                 {
                     dictionary.Add(key, ToStringInvariant(value));
-                }
-                else if (value.GetType().IsGenericType)
-                {
-                    GenericToDictionary(dictionary, prefix, value, key, visitedObjects);
                 }
                 else
                 {
@@ -76,50 +88,52 @@ public static class Flatter
     }
 
     /// <summary>
-    /// Handles conversion of generic types (Dictionary and List) to dictionary entries
+    /// Handles conversion of dictionaries to dictionary entries
     /// </summary>
-    /// <param name="dictionary">Target dictionary to populate</param>
-    /// <param name="prefix">Current key prefix</param>
-    /// <param name="value">Generic object value to process</param>
-    /// <param name="key">Current key for the value</param>
-    /// <param name="visitedObjects">Set of visited objects for cycle detection</param>
-    private static void GenericToDictionary(Dictionary<string, string> dictionary, string prefix, object value,
-        string key, HashSet<object> visitedObjects)
+    private static void DictionaryToDictionary(Dictionary<string, string> dictionary, object dict, string prefix,
+        HashSet<object> visitedObjects)
     {
-        if (value.GetType().GetGenericTypeDefinition() == typeof(Dictionary<,>))
+        if (dict is IDictionary dictionary1)
         {
-            if (value is IDictionary dictionary1)
+            foreach (DictionaryEntry keyValue in dictionary1)
             {
-                foreach (DictionaryEntry keyValue in dictionary1)
+                var key = string.IsNullOrEmpty(prefix) 
+                    ? $"{keyValue.Key}" 
+                    : $"{prefix}:{keyValue.Key}";
+
+                if (IsSimpleOrNull(keyValue.Value))
                 {
-                    var key2 = $"{prefix}{key}:{keyValue.Key}";
-                    if (IsSimpleOrNull(keyValue.Value))
-                    {
-                        dictionary.Add(key2, ToStringInvariant(keyValue.Value));
-                    }
-                    else
-                    {
-                        ToDictionaryInternal(dictionary, keyValue.Value!, key2, visitedObjects);
-                    }
-                }
-            }
-        }
-        else if (value.GetType().GetGenericTypeDefinition() == typeof(List<>))
-        {
-            var i = 0;
-            foreach (var item in (IEnumerable)value)
-            {
-                if (IsSimpleOrNull(item))
-                {
-                    dictionary.Add($"{key}:{i}", ToStringInvariant(item));
+                    dictionary.Add(key, ToStringInvariant(keyValue.Value));
                 }
                 else
                 {
-                    ToDictionaryInternal(dictionary, item, $"{key}:{i}", visitedObjects);
+                    ToDictionaryInternal(dictionary, keyValue.Value!, key, visitedObjects);
                 }
-
-                i++;
             }
+        }
+    }
+
+    /// <summary>
+    /// Handles conversion of lists and collections to dictionary entries
+    /// </summary>
+    private static void ListToDictionary(Dictionary<string, string> dictionary, object list, string prefix,
+        HashSet<object> visitedObjects)
+    {
+        var i = 0;
+        foreach (var item in (IEnumerable)list)
+        {
+            var key = $"{prefix}:{i}";
+            
+            if (IsSimpleOrNull(item))
+            {
+                dictionary.Add(key, ToStringInvariant(item));
+            }
+            else
+            {
+                ToDictionaryInternal(dictionary, item, key, visitedObjects);
+            }
+
+            i++;
         }
     }
 
@@ -134,7 +148,7 @@ public static class Flatter
         {
             null => string.Empty,
             IFormattable formattable => formattable.ToString(null, CultureInfo.InvariantCulture),
-            _ => obj.ToString()!
+            _ => obj.ToString() ?? string.Empty
         };
     }
 
