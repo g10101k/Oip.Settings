@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Text.Json;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Primitives;
@@ -88,6 +89,7 @@ public class BaseAppSettings<TAppSettings> : IAppSettings where TAppSettings : c
     /// <returns>Initialized application settings instance</returns>
     public static TAppSettings Initialize(AppSettingsOptions appSettingsOptions)
     {
+        _temporaryInstance = _instance = null;
         _appSettingsOptions = appSettingsOptions ?? throw new ArgumentNullException(nameof(appSettingsOptions));
         return Instance;
     }
@@ -196,7 +198,7 @@ public class BaseAppSettings<TAppSettings> : IAppSettings where TAppSettings : c
     {
         if (_appSettingsOptions == null)
         {
-                throw new InvalidOperationException("AppSettingsOptions is not initialized");
+            throw new InvalidOperationException("AppSettingsOptions is not initialized");
         }
 
         return configurationBuilder

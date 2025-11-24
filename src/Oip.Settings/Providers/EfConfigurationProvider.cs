@@ -2,7 +2,6 @@ using Microsoft.Extensions.Configuration;
 using Oip.Settings.Contexts;
 using Oip.Settings.Entities;
 using Oip.Settings.Helpers;
-using System.Text.Json;
 
 namespace Oip.Settings.Providers;
 
@@ -13,13 +12,6 @@ namespace Oip.Settings.Providers;
 public class EfConfigurationProvider<TAppSettings>(AppSettingsOptions appSettingsOptions, TAppSettings appSettings)
     : ConfigurationProvider where TAppSettings : class, IAppSettings
 {
-    private readonly JsonSerializerOptions _jsonOptions = new()
-    {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        WriteIndented = true,
-        Converters = { new AppSettingsJsonConverter<TAppSettings>() }
-    };
-
     /// <summary>
     /// Load settings
     /// </summary>
@@ -81,7 +73,7 @@ public class EfConfigurationProvider<TAppSettings>(AppSettingsOptions appSetting
 
         if (existingEntity == null)
         {
-            var jsonValue = JsonSerializer.Serialize(appSettings, _jsonOptions);
+            var jsonValue = JsonHelper<TAppSettings>.ToJson(appSettings);
 
             dbContext.AppSettings.Add(new AppSettingEntity
             {
@@ -104,7 +96,7 @@ public class EfConfigurationProvider<TAppSettings>(AppSettingsOptions appSetting
 
         if (jsonEntity != null && !string.IsNullOrEmpty(jsonEntity.Value))
         {
-            var deserializedSettings = JsonSerializer.Deserialize<TAppSettings>(jsonEntity.Value, _jsonOptions);
+            var deserializedSettings = JsonHelper<TAppSettings>.FromJson(jsonEntity.Value);
             if (deserializedSettings != null)
             {
                 Data = Flatter.ToDictionary(deserializedSettings);

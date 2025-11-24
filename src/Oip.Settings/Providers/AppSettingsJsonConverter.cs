@@ -35,9 +35,9 @@ public class AppSettingsJsonConverter<T> : JsonConverter<T> where T : class
 
             if (property.GetCustomAttribute<NotSaveToDbAttribute>() != null)
                 continue;
-
+            var propertyName = options.PropertyNamingPolicy?.ConvertName(property.Name) ?? property.Name;
             var propertyValue = property.GetValue(value);
-            writer.WritePropertyName(property.Name);
+            writer.WritePropertyName(propertyName);
             JsonSerializer.Serialize(writer, propertyValue, options);
         }
 
