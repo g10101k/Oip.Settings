@@ -119,5 +119,7 @@ public class AddObjectPropertiesAsSingletonsTests
         {
             set { }
         }
+        
+        public DummyRecord RecordProp { get; set; } = new DummyRecord("RecordProp");
     }
 }

@@ -104,12 +104,15 @@ public class JsonAppSettingsTests : BaseSettingsTest
     public void Instance_TestTwoInstances()
     {
         var instance = JsonTestAppSettings.Initialize(new AppSettingsOptions());
+
+        Assert.That(instance, Is.EqualTo(JsonTestAppSettings.Instance));
+
         var instance2 = JsonTestAppSettings.Initialize(new AppSettingsOptions()
         {
             JsonFileName = "custom.json",
         });
 
-        Assert.That(instance, Is.EqualTo(instance2));
+        Assert.That(instance, Is.Not.EqualTo(instance2));
     }
 
     /// <summary>
