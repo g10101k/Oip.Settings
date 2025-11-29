@@ -14,63 +14,69 @@ namespace Microsoft.Extensions.DependencyInjection;
 public static class ServiceCollectionExtension
 {
     /// <summary>
-    /// Adds AppSettings context and registers complex properties of <see cref="IAppSettings"/>.
+    /// IServiceCollection extension
     /// </summary>
-    public static IServiceCollection AddAppSettingsDbContext(this IServiceCollection services, IAppSettings appSettings)
+    extension(IServiceCollection services)
     {
-        return services.AddDbContext<AppSettingsContext>(option =>
+        /// <summary>
+        /// Adds AppSettings context and registers complex properties of <see cref="IAppSettings"/>.
+        /// </summary>
+        public IServiceCollection AddAppSettingsDbContext(IAppSettings appSettings)
         {
-            switch (appSettings.Provider)
+            return services.AddDbContext<AppSettingsContext>(option =>
             {
-                case XpoProvider.SQLite:
-                    option.UseSqlite(appSettings.NormalizedConnectionString);
-                    break;
-                case XpoProvider.Postgres:
-                    option.UseNpgsql(appSettings.NormalizedConnectionString);
-                    break;
-                case XpoProvider.MSSqlServer:
-                    option.UseSqlServer(appSettings.NormalizedConnectionString);
-                    break;
-                case XpoProvider.InMemoryDataStore:
-                    option.UseInMemoryDatabase(appSettings.NormalizedConnectionString);
-                    break;
-                default:
-                    throw new InvalidOperationException("Unknown provider");
-            }
-        });
-    }
-
-    /// <summary>
-    /// Registers public object properties except simple types and properties marked with DoNotAddToDependencyInjection.
-    /// </summary>
-    public static IServiceCollection AddSettingsToDependencyInjection(this IServiceCollection services, object instance)
-    {
-        if (instance == null)
-            throw new ArgumentNullException(nameof(instance));
-
-        var props = instance.GetType()
-            .GetProperties(BindingFlags.Public | BindingFlags.Instance);
-
-        foreach (var prop in props)
-        {
-            if (!prop.CanRead)
-                continue;
-
-            // Skip properties marked with attribute
-            if (prop.GetCustomAttribute<NotAddToDependencyInjectionAttribute>() != null)
-                continue;
-
-            var value = prop.GetValue(instance);
-            if (value == null)
-                continue;
-
-            if (IsSimpleType(prop.PropertyType))
-                continue;
-
-            services.AddSingleton(prop.PropertyType, value);
+                switch (appSettings.Provider)
+                {
+                    case XpoProvider.SQLite:
+                        option.UseSqlite(appSettings.NormalizedConnectionString);
+                        break;
+                    case XpoProvider.Postgres:
+                        option.UseNpgsql(appSettings.NormalizedConnectionString);
+                        break;
+                    case XpoProvider.MSSqlServer:
+                        option.UseSqlServer(appSettings.NormalizedConnectionString);
+                        break;
+                    case XpoProvider.InMemoryDataStore:
+                        option.UseInMemoryDatabase(appSettings.NormalizedConnectionString);
+                        break;
+                    default:
+                        throw new InvalidOperationException("Unknown provider");
+                }
+            });
         }
 
-        return services;
+        /// <summary>
+        /// Registers public object properties except simple types and properties marked with DoNotAddToDependencyInjection.
+        /// </summary>
+        public IServiceCollection AddSettingsToDependencyInjection(object instance)
+        {
+            if (instance == null)
+                throw new ArgumentNullException(nameof(instance));
+
+            var props = instance.GetType()
+                .GetProperties(BindingFlags.Public | BindingFlags.Instance);
+
+            foreach (var prop in props)
+            {
+                if (!prop.CanRead)
+                    continue;
+
+                // Skip properties marked with attribute
+                if (prop.GetCustomAttribute<NotAddToDependencyInjectionAttribute>() != null)
+                    continue;
+
+                var value = prop.GetValue(instance);
+                if (value == null)
+                    continue;
+
+                if (IsSimpleType(prop.PropertyType))
+                    continue;
+
+                services.AddSingleton(prop.PropertyType, value);
+            }
+
+            return services;
+        }
     }
 
     /// <summary>
