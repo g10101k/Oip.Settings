@@ -24,9 +24,13 @@ public class AddObjectPropertiesAsSingletonsTests
         services.AddSettingsToDependencyInjection(settings);
         var provider = services.BuildServiceProvider();
 
-        Assert.That(provider.GetService<DummyApplicationSettings>(), Is.Not.Null);
-        Assert.That(provider.GetService<DummyApplicationSettingsV3>(), Is.Null);
-        Assert.That(provider.GetService<DummyApplicationSettingsV4>(), Is.Null);
+        Assert.That(provider.GetService<ComplexSettings>(), Is.Not.Null);
+        Assert.That(provider.GetService<ListWrapperSettings>(), Is.Not.Null);
+        Assert.That(provider.GetService<DictionaryWrapperSettings>(), Is.Not.Null);
+
+        Assert.That(provider.GetService<NullComplexSettings>(), Is.Null);
+        Assert.That(provider.GetService<WriteOnlyPropSettings>(), Is.Null);
+        Assert.That(provider.GetService<IgnoredByAttrSettings>(), Is.Null);
     }
 
     [Test]
@@ -50,7 +54,7 @@ public class AddObjectPropertiesAsSingletonsTests
         services.AddSettingsToDependencyInjection(settings);
         var provider = services.BuildServiceProvider();
 
-        var resolved = provider.GetRequiredService<DummyApplicationSettings>();
+        var resolved = provider.GetRequiredService<ComplexSettings>();
         Assert.That(resolved, Is.Not.Null); // Only "Complex" should be injected
     }
 
@@ -72,38 +76,38 @@ public class AddObjectPropertiesAsSingletonsTests
         services.AddSettingsToDependencyInjection(settings);
         var provider = services.BuildServiceProvider();
 
-        var instance1 = provider.GetRequiredService<DummyApplicationSettings>();
-        var instance2 = provider.GetRequiredService<DummyApplicationSettings>();
+        var instance1 = provider.GetRequiredService<ComplexSettings>();
+        var instance2 = provider.GetRequiredService<ComplexSettings>();
 
         Assert.That(instance1, Is.SameAs(instance2));
     }
 
-    private class DummyApplicationSettings
+    private class ComplexSettings
     {
-        public string Name { get; set; } = nameof(DummyApplicationSettings);
+        public string Name { get; set; } = nameof(ComplexSettings);
     }
 
-    private class DummyApplicationSettingsV2
+    private class IgnoredByAttrSettings
     {
-        public string Name { get; set; } = nameof(DummyApplicationSettingsV2);
+        public string Name { get; set; } = nameof(IgnoredByAttrSettings);
     }
 
 
-    private class DummyApplicationSettingsV3
+    private class NullComplexSettings
     {
-        public string Name { get; set; } = nameof(DummyApplicationSettingsV3);
+        public string Name { get; set; } = nameof(NullComplexSettings);
     }
 
-    private class DummyApplicationSettingsV4
+    private class WriteOnlyPropSettings
     {
-        public string Name { get; set; } = nameof(DummyApplicationSettingsV4);
+        public string Name { get; set; } = nameof(WriteOnlyPropSettings);
     }
 
     private record DummyRecord(string Name);
 
     private class TestSettings
     {
-        public DummyApplicationSettings Complex { get; set; } = new DummyApplicationSettings() { Name = "visible" };
+        public ComplexSettings Complex { get; set; } = new ComplexSettings() { Name = "visible" };
 
         public string Name { get; set; } = "str";
         public int IntValue { get; set; } = 42;
@@ -111,15 +115,20 @@ public class AddObjectPropertiesAsSingletonsTests
         public List<string> List { get; set; } = ["a"];
 
         [NotAddToDependencyInjection]
-        public DummyApplicationSettingsV2 IgnoredByAttr { get; set; } = new() { Name = "not visible" };
+        public IgnoredByAttrSettings IgnoredByAttr { get; set; } = new() { Name = "not visible" };
 
-        public DummyApplicationSettingsV3 NullComplex { get; set; } = null;
+        public NullComplexSettings NullComplex { get; set; } = null;
 
-        public DummyApplicationSettingsV4 WriteOnlyProp
+        public WriteOnlyPropSettings WriteOnlyProp
         {
             set { }
         }
-        
-        public DummyRecord RecordProp { get; set; } = new DummyRecord("RecordProp");
+
+        public DummyRecord RecordProp { get; set; } = new("RecordProp");
+        public ListWrapperSettings ListWrapper { get; set; } = new();
+        public DictionaryWrapperSettings DictionaryWrapper { get; set; } = new();
     }
+
+    private class ListWrapperSettings : List<string>;
+    private class DictionaryWrapperSettings : Dictionary<string, string>;
 }

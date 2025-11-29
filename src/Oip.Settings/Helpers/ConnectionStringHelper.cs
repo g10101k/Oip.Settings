@@ -10,12 +10,15 @@ namespace Oip.Settings.Helpers;
 public static class ConnectionStringHelper
 {
     /// <summary>
-    /// Convert DE connection string to <see cref="ConnectionModel" />
+    /// Normalizes a connection string by extracting the XpoProvider and returning a ConnectionModel.
     /// </summary>
-    /// <param name="connectionString">Connection string in DE format with <see cref="XpoProvider" /></param>
-    /// <returns></returns>
+    /// <param name="connectionString">The connection string to normalize.</param>
+    /// <returns>A <see cref="ConnectionModel"/> containing the extracted provider and the normalized connection string.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when the connection string is null or empty.</exception>
     public static ConnectionModel NormalizeConnectionString(string connectionString)
     {
+        if (string.IsNullOrEmpty(connectionString))
+            throw new ArgumentNullException(nameof(connectionString));
         var provider = XpoProvider.InMemoryDataStore;
         var regex = new Regex(@"XpoProvider\s*=(.*?);", (RegexOptions)531);
         var matches = regex.Matches(connectionString);
