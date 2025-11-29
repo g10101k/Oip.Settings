@@ -52,9 +52,42 @@ public class NormalizeConnectionStringTests
 
     [TestCase(null)]
     [TestCase("")]
-    public void NormalizeConnection_WithNullInput_Exception(string connectionString)
+    public void NormalizeConnectionString_WithNullOrEmptyInput_ThrowsArgumentNullException(string connectionString)
     {
         Assert.Catch<ArgumentNullException>(() => ConnectionStringHelper.NormalizeConnectionString(connectionString));
+    }
+    
+    [TestCase("XpoProvider=MSSqlServer;Server=localhost", "Server=localhost")]
+    public void NormalizeConnectionString_PreservesOtherParameters(string connectionString, string expectedParams)
+    {
+        // Act
+        var model = ConnectionStringHelper.NormalizeConnectionString(connectionString);
+    
+        // Assert
+        Assert.That(model.NormalizeConnectionString, Does.Contain(expectedParams));
+    }
+
+    [TestCase("xpoprovider=MSSqlServer;", XpoProvider.MSSqlServer)]
+    public void NormalizeConnectionString_IsCaseInsensitive(string connectionString, XpoProvider expectedProvider)
+    {
+        // Act
+        var model = ConnectionStringHelper.NormalizeConnectionString(connectionString);
+    
+        // Assert
+        Assert.That(model.Provider, Is.EqualTo(expectedProvider));
+    }
+    
+    [Test]
+    public void NormalizeConnectionString_WithInvalidProvider_ReturnsUnknownProvider()
+    {
+        // Arrange
+        var connectionString = "InvalidProvider=Test;";
+    
+        // Act
+        var model = ConnectionStringHelper.NormalizeConnectionString(connectionString);
+    
+        // Assert
+        Assert.That(model.Provider, Is.EqualTo(XpoProvider.InMemoryDataStore));
     }
 
     /// <summary>
