@@ -115,6 +115,7 @@ public class JsonAppSettingsTests : BaseSettingsTest
         Assert.That(instance, Is.Not.EqualTo(instance2));
     }
 
+
     /// <summary>
     /// Mock application settings class for testing JSON configuration
     /// </summary>

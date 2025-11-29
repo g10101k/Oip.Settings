@@ -28,12 +28,12 @@ public class BaseAppSettings<TAppSettings> : IAppSettings where TAppSettings : c
     private static TAppSettings? _instance;
 
     /// <summary>
-    /// Временный инстанс без настроек из бд
+    /// Temporary instance without settings from the database
     /// </summary>
     private static TAppSettings? _temporaryInstance;
 
     /// <summary>
-    /// Настройка поведение получения конфигурации
+    /// Setting the behavior of configuration retrieval
     /// </summary>
     private static AppSettingsOptions? _appSettingsOptions;
 
@@ -221,8 +221,12 @@ public class BaseAppSettings<TAppSettings> : IAppSettings where TAppSettings : c
 
     internal static void NormalizeConnectionString(TAppSettings instance)
     {
-        if (string.IsNullOrEmpty(instance.ConnectionString) ||
-            !instance.AppSettingsOptions.NormalizeConnectionString)
+        if (string.IsNullOrEmpty(instance.ConnectionString))
+            return;
+
+        instance.NormalizedConnectionString = instance.ConnectionString;
+
+        if (!instance.AppSettingsOptions.NormalizeConnectionString)
         {
             return;
         }
