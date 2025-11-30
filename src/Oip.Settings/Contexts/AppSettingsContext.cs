@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Oip.Settings.Entities;
 using Oip.Settings.EntityConfigurations;
+using Oip.Settings.Helpers;
 
 namespace Oip.Settings.Contexts;
 
@@ -101,4 +102,116 @@ public class AppSettingsContext : DbContext
         }
     }
 
+    internal void CreateAndSaveDefaultCommon<TAppSettings>(TAppSettings settings, bool overwrite = false)
+        where TAppSettings : class, IAppSettings
+    {
+        if (_appSettingsOptions.UseJsonStorage)
+        {
+            CreateAndSaveDefaultValuesAsJson(settings, overwrite);
+        }
+        else
+        {
+            CreateAndSaveDefaultValues(settings, overwrite);
+        }
+    }
+
+    /// <summary>
+    /// Create and save settings as JSON to db
+    /// </summary>
+    private void CreateAndSaveDefaultValuesAsJson<TAppSettings>(TAppSettings settings, bool overwrite = false)
+        where TAppSettings : class, IAppSettings
+    {
+        var typeName = typeof(TAppSettings).FullName!;
+        var existingEntity = AppSettings.FirstOrDefault(x => x.Key == typeName);
+
+        if (existingEntity == null)
+        {
+            var jsonValue = JsonHelper<TAppSettings>.ToJson(settings);
+
+            AppSettings.Add(new AppSettingEntity
+            {
+                Key = typeName,
+                Value = jsonValue,
+            });
+        }
+        else
+        {
+            if (overwrite)
+            {
+                existingEntity.Value = JsonHelper<TAppSettings>.ToJson(settings);
+            }
+        }
+
+        SaveChanges();
+    }
+
+    /// <summary>
+    /// Create and save settings with default value to db (traditional key-value)
+    /// </summary>
+    private void CreateAndSaveDefaultValues<TAppSettings>(TAppSettings appSettings, bool overwrite = false)
+        where TAppSettings : class, IAppSettings
+    {
+        var configValues = Flatter.ToDictionary(appSettings);
+        var list = AppSettings.ToList();
+
+        foreach (var keyValue in configValues)
+        {
+            if (list.Exists(x => x.Key == keyValue.Key))
+            {
+                if (overwrite)
+                {
+                    AppSettings.FirstOrDefault(x => x.Key == keyValue.Key)?.Value = keyValue.Value;
+                }
+            }
+            else
+            {
+                AppSettings.Add(new AppSettingEntity
+                {
+                    Key = keyValue.Key,
+                    Value = keyValue.Value
+                });
+            }
+        }
+
+        SaveChanges();
+    }
+
+
+    internal IDictionary<string, string> GetDataForSettings<TAppSettings>()
+        where TAppSettings : class, IAppSettings
+    {
+        return _appSettingsOptions.UseJsonStorage
+            ? LoadJsonData<TAppSettings>()
+            : AppSettings.ToDictionary(c => c.Key, c => c.Value)!;
+    }
+
+    /// <summary>
+    /// Load data from JSON storage
+    /// </summary>
+    private Dictionary<string, string> LoadJsonData<TAppSettings>()
+        where TAppSettings : class, IAppSettings
+    {
+        var typeName = typeof(TAppSettings).FullName!;
+        var jsonEntity = AppSettings.FirstOrDefault(x => x.Key == typeName);
+
+        if (jsonEntity != null && !string.IsNullOrEmpty(jsonEntity.Value))
+        {
+            var deserializedSettings = JsonHelper<TAppSettings>.FromJson(jsonEntity.Value);
+            if (deserializedSettings != null)
+            {
+                return Flatter.ToDictionary(deserializedSettings);
+            }
+        }
+        else
+        {
+            return Flatter.ToDictionary(_appSettings);
+        }
+
+        return new Dictionary<string, string>();
+    }
+
+    internal void SyncSettings<TAppSettings>(TAppSettings appSettings) where TAppSettings : class, IAppSettings
+    {
+        CreateAndSaveDefaultCommon(appSettings, true);
+    }
 }
