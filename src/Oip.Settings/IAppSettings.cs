@@ -31,4 +31,9 @@ public interface IAppSettings
     /// Rebinds the application settings
     /// </summary>
     void Rebind();
+
+    /// <summary>
+    /// Saves the current application settings to the database
+    /// </summary>
+    void SaveSettingsToDb();
 }
