@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
+using Mcrio.Configuration.Provider.Docker.Secrets;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Primitives;
@@ -214,6 +216,7 @@ public class BaseAppSettings<TAppSettings> : IAppSettings where TAppSettings : c
             .AddJsonFile(_appSettingsOptions.JsonFileName, optional: true, reloadOnChange: true)
             .AddJsonFile(_appSettingsOptions.JsonFileNameDevelopment, optional: true, reloadOnChange: true)
             .AddUserSecrets<TAppSettings>()
+            .AddDockerSecrets()
             .AddSpaConfig()
             .AddModuleConfig()
             .AddEnvironmentVariables()

@@ -4,7 +4,9 @@ Application settings with EFCore provider with priority:
 
 * Command line argument
 * Environment variables
-* Json file
+* JSON files
+* User secret
+* Docker secret
 * EF Core
 
 # Startup
