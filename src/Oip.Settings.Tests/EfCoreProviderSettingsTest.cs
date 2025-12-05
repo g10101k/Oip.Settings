@@ -12,18 +12,10 @@ namespace Oip.Settings.Tests;
 [TestFixture(false, "appsettings-sql-server.json")]
 [TestFixture(true, "appsettings-pg.json")]
 [TestFixture(false, "appsettings-pg.json")]
-public class EfCoreProviderSettingsTest : BaseSettingsTest
+public class EfCoreProviderSettingsTest(bool useJsonStorage, string appSettingsJson) : BaseSettingsTest
 {
-    private readonly bool _useJsonStorage;
-    private readonly string _testSettingsFile;
     private const string DevelopmentSettingsFile = "appsettings.json";
     private const int ModifiedTestIntValue = 34;
-
-    public EfCoreProviderSettingsTest(bool useJsonStorage, string appSettingsJson)
-    {
-        _useJsonStorage = useJsonStorage;
-        _testSettingsFile = appSettingsJson;
-    }
 
     /// <summary>
     /// Tests SQLite settings initialization with development fallback configuration
@@ -34,17 +26,15 @@ public class EfCoreProviderSettingsTest : BaseSettingsTest
         // Arrange
         var appSettingsOptions = new AppSettingsOptions
         {
-            JsonFileName = _testSettingsFile,
+            JsonFileName = appSettingsJson,
             JsonFileNameDevelopment = DevelopmentSettingsFile,
-            UseJsonStorage = _useJsonStorage
+            UseJsonStorage = useJsonStorage
         };
 
         // Act
         var instance = AppSettings.Initialize(appSettingsOptions);
 
         // Assert
-        Assert.That(instance, Is.Not.Null, "Settings instance should not be null");
-
         TestBaseSettings(instance);
     }
 
@@ -57,20 +47,18 @@ public class EfCoreProviderSettingsTest : BaseSettingsTest
         // Arrange & Act
         var instance = AppSettings.Initialize(new AppSettingsOptions
         {
-            JsonFileName = _testSettingsFile,
-            UseJsonStorage = _useJsonStorage
+            JsonFileName = appSettingsJson,
+            UseJsonStorage = useJsonStorage
         });
 
-        // Assert
         TestBaseSettings(instance);
-        Assert.That(instance, Is.Not.Null, "Settings instance should not be null");
     }
 
     [Test, Order(3)]
     public void Initialize_ChangeDbSettingsAndReload_ShouldReflectChanges()
     {
         using var context = AppSettings.GetAppSettingsContext();
-        if (_useJsonStorage)
+        if (useJsonStorage)
         {
             var originalSetting = context.AppSettings.First(x => x.Key == typeof(AppSettings).FullName);
 
@@ -94,6 +82,29 @@ public class EfCoreProviderSettingsTest : BaseSettingsTest
 
         // Assert
         Assert.That(AppSettings.Instance.TestInt, Is.EqualTo(ModifiedTestIntValue),
+            "Settings should reflect database changes after reload");
+    }
+
+    [Test, Order(4)]
+    public void Initialize_ChangeAndSave_ShouldReflectChanges()
+    {
+        const int newTestIntValue = 112358;
+        AppSettings.Instance.TestInt = newTestIntValue;
+
+        // Act - Reload settings
+        AppSettings.Instance.SaveSettingsToDb();
+
+        // Assert
+        Assert.That(AppSettings.Instance.TestInt, Is.EqualTo(newTestIntValue),
+            "Settings should reflect database changes after save and inner rebind");
+        // Arrange & Act
+        var instance = AppSettings.Initialize(new AppSettingsOptions
+        {
+            JsonFileName = appSettingsJson,
+            UseJsonStorage = useJsonStorage
+        });
+        Assert.That(instance.TestInt, Is.EqualTo(newTestIntValue), "Settings should reflect database changes after reload");
+        Assert.That(AppSettings.Instance.TestInt, Is.EqualTo(newTestIntValue),
             "Settings should reflect database changes after reload");
     }
 

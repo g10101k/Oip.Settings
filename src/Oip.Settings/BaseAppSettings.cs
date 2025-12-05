@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using Mcrio.Configuration.Provider.Docker.Secrets;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -106,6 +106,14 @@ public class BaseAppSettings<TAppSettings> : IAppSettings where TAppSettings : c
         BindMainConfiguration(_instance, _temporaryInstance);
     }
 
+    /// <inheritdoc />
+    public void SaveSettingsToDb()
+    {
+        using var context = GetAppSettingsContext();
+        context.SyncSettings(Instance);
+        Instance.Rebind();
+    }
+
     /// <summary>
     /// Gets the application settings context
     /// </summary>
@@ -114,6 +122,7 @@ public class BaseAppSettings<TAppSettings> : IAppSettings where TAppSettings : c
     {
         return new AppSettingsContext(Instance);
     }
+
 
     /// <summary>
     /// Initialize app settings with detailed parameters

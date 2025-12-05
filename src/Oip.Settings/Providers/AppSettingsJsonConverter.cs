@@ -18,7 +18,7 @@ public class AppSettingsJsonConverter<T> : JsonConverter<T> where T : class
         var tempOptions = new JsonSerializerOptions(options);
         tempOptions.Converters.Remove(this);
 
-        return JsonSerializer.Deserialize<T>(ref reader, tempOptions);
+        return JsonSerializer.Deserialize<T>(ref reader, tempOptions)!;
     }
 
     /// <inheritdoc />
