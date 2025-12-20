@@ -1,7 +1,5 @@
 using Microsoft.Extensions.Configuration;
 using Oip.Settings.Contexts;
-using Oip.Settings.Entities;
-using Oip.Settings.Helpers;
 
 namespace Oip.Settings.Providers;
 

@@ -1,4 +1,3 @@
-using System.Text.Json;
 using Mcrio.Configuration.Provider.Docker.Secrets;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -94,6 +93,12 @@ public class BaseAppSettings<TAppSettings> : IAppSettings where TAppSettings : c
         _appSettingsOptions = appSettingsOptions ?? throw new ArgumentNullException(nameof(appSettingsOptions));
         return Instance;
     }
+    
+    
+    /// <summary>
+    /// Delegate that is invoked when a property value changes.
+    /// </summary>
+    public event Action? OnChange;
 
     /// <summary>
     /// Rebind main configuration from temporary instance
@@ -104,6 +109,7 @@ public class BaseAppSettings<TAppSettings> : IAppSettings where TAppSettings : c
             throw new InvalidOperationException("Instances are not initialized. Call Initialize method first.");
 
         BindMainConfiguration(_instance, _temporaryInstance);
+        OnChange?.Invoke();
     }
 
     /// <inheritdoc />
