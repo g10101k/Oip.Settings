@@ -107,6 +107,8 @@ public class EfCoreProviderSettingsTest(bool useJsonStorage, string appSettingsJ
         Assert.That(AppSettings.Instance.TestInt, Is.EqualTo(newTestIntValue),
             "Settings should reflect database changes after reload");
     }
+    
+    
 
     [OneTimeTearDown]
     public void OneTimeTearDown()

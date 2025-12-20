@@ -5,7 +5,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <LangVersion>latest</LangVersion>
-        <Version>1.2.4</Version>
+        <Version>1.3.0</Version>
     </PropertyGroup>
 
     <PropertyGroup>
@@ -17,7 +17,11 @@
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <RepositoryUrl>https://github.com/g10101k/Oip.Settings</RepositoryUrl>
         <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageIcon>./icon.png</PackageIcon>
     </PropertyGroup>
+    <ItemGroup Label="Files">
+        <None Include="./icon.png" Pack="true" PackagePath="/"/>
+    </ItemGroup>
 
     <ItemGroup>
         <InternalsVisibleTo Include="Oip.Settings.Tests"/>
