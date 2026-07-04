@@ -36,4 +36,9 @@ public interface IAppSettings
     /// Saves the current application settings to the database
     /// </summary>
     void SaveSettingsToDb();
+
+    /// <summary>
+    /// Returns true when ASPNETCORE_ENVIRONMENT is Development
+    /// </summary>
+    bool IsDevelopment();
 }

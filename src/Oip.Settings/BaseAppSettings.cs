@@ -76,6 +76,48 @@ public class BaseAppSettings<TAppSettings> : IAppSettings where TAppSettings : c
     [NotSaveToDb]
     public XpoProvider Provider { get; set; } = XpoProvider.InMemoryDataStore;
 
+    /// <summary>
+    /// ASP.NET Core hosting environment name from ASPNETCORE_ENVIRONMENT.
+    /// </summary>
+    [NotSaveToDb]
+    [ConfigurationKeyName("ASPNETCORE_ENVIRONMENT")]
+    public string? AspNetCoreEnvironment { get; set; }
+
+    /// <summary>
+    /// ASP.NET Core server URLs from ASPNETCORE_URLS.
+    /// </summary>
+    [NotSaveToDb]
+    [ConfigurationKeyName("ASPNETCORE_URLS")]
+    public string? AspNetCoreUrls { get; set; }
+
+    /// <summary>
+    /// ASP.NET Core HTTP ports from ASPNETCORE_HTTP_PORTS.
+    /// </summary>
+    [NotSaveToDb]
+    [ConfigurationKeyName("ASPNETCORE_HTTP_PORTS")]
+    public string? AspNetCoreHttpPorts { get; set; }
+
+    /// <summary>
+    /// ASP.NET Core HTTPS ports from ASPNETCORE_HTTPS_PORTS.
+    /// </summary>
+    [NotSaveToDb]
+    [ConfigurationKeyName("ASPNETCORE_HTTPS_PORTS")]
+    public string? AspNetCoreHttpsPorts { get; set; }
+
+    /// <summary>
+    /// ASP.NET Core content root path from ASPNETCORE_CONTENTROOT.
+    /// </summary>
+    [NotSaveToDb]
+    [ConfigurationKeyName("ASPNETCORE_CONTENTROOT")]
+    public string? AspNetCoreContentRoot { get; set; }
+
+    /// <summary>
+    /// ASP.NET Core web root path from ASPNETCORE_WEBROOT.
+    /// </summary>
+    [NotSaveToDb]
+    [ConfigurationKeyName("ASPNETCORE_WEBROOT")]
+    public string? AspNetCoreWebRoot { get; set; }
+
     /// <inheritdoc />
     [NotSaveToDb]
     public AppSettingsOptions AppSettingsOptions => _appSettingsOptions ??
@@ -118,6 +160,12 @@ public class BaseAppSettings<TAppSettings> : IAppSettings where TAppSettings : c
         using var context = GetAppSettingsContext();
         context.SyncSettings(Instance);
         Instance.Rebind();
+    }
+
+    /// <inheritdoc />
+    public bool IsDevelopment()
+    {
+        return string.Equals(AspNetCoreEnvironment, "Development", StringComparison.OrdinalIgnoreCase);
     }
 
     /// <summary>

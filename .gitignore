@@ -21,8 +21,7 @@ build/
 bld/
 bin/
 Bin/
-obj/
-Obj/
+[Oo]bj/
 
 # Visual Studio 2015 cache/options directory
 .vs/
@@ -275,3 +274,8 @@ Thumbs.db
 
 # npm ignore
 package-lock.json
+
+
+.idea/
+
+/src/Oip.Settings.Example/settings.db
