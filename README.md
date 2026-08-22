@@ -1,15 +1,15 @@
 # Oip.Settings
 
-Application settings with EFCore provider with priority:
+Application settings with an EF Core provider. Sources in order of priority:
 
 * Command line argument
 * Environment variables
-* Json file
+* JSON file
 * EF Core
 
 # Startup
 
-1. Make class with settings
+1. Create a settings class
 
 ````csharp
 public class AppSettings : BaseAppSettings<AppSettings>
@@ -19,7 +19,7 @@ public class AppSettings : BaseAppSettings<AppSettings>
 }
 ````
 
-2. Initialize settings with ConnectionString in in json file, command line arg or other
+2. Initialize settings with a ConnectionString from a JSON file, a command line argument or elsewhere
 
 ````csharp
 public class Program
@@ -39,4 +39,24 @@ public class Program
         app.Run();
     }
 }
+````
+
+# Running tests
+
+Run all tests
+
+````shell
+dotnet test ./src/Oip.Settings.sln
+````
+
+Run tests that don't need external services
+
+````shell
+dotnet test ./src/Oip.Settings.sln --filter "TestCategory!=Integration"
+````
+
+Run only tests that need external services
+
+````shell
+dotnet test ./src/Oip.Settings.sln --filter "TestCategory=Integration"
 ````
