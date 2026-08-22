@@ -41,6 +41,60 @@ public class Program
 }
 ````
 
+# Connection string as a model
+
+`ConnectionString` is written as a plain string in `appsettings.json`, but is available in code as a
+`ConnectionModel`:
+
+````json
+{
+  "ConnectionString": "XpoProvider=SQLite;Data Source=settings.db"
+}
+````
+
+````csharp
+AppSettings.Instance.ConnectionString.Provider;                  // XpoProvider.SQLite
+AppSettings.Instance.ConnectionString.NormalizeConnectionString; // Data Source=settings.db
+AppSettings.Instance.ConnectionString.ConnectionString;          // XpoProvider=SQLite;Data Source=settings.db
+````
+
+`ConnectionString` is typed as `ConnectionModel` and is the single place where the parsed connection string lives.
+The former `Provider`, `NormalizedConnectionString` and `Connection` properties are removed, use
+`ConnectionString.Provider` and `ConnectionString.NormalizeConnectionString` instead.
+
+`ConnectionModel` has a `TypeConverter`, so any own property of this type is bound from a plain string too:
+
+````csharp
+public class AppSettings : BaseAppSettings<AppSettings>
+{
+    public ConnectionModel ReportConnection { get; set; } = default!;
+}
+````
+
+````json
+{
+  "ReportConnection": "XpoProvider=Postgres;Server=localhost;Database=report;"
+}
+````
+
+# Sensitive data logging
+
+`SensitiveDataLogging` is a custom connection string parameter, just like `XpoProvider`. It is stripped from
+the normalized connection string and turns on EF Core sensitive data logging for the settings `DbContext`:
+
+````json
+{
+  "ConnectionString": "XpoProvider=SQLite;SensitiveDataLogging=true;Data Source=settings.db"
+}
+````
+
+````csharp
+AppSettings.Instance.ConnectionString.SensitiveDataLogging;      // true
+AppSettings.Instance.ConnectionString.NormalizeConnectionString; // Data Source=settings.db
+````
+
+Do not enable it in production: EF Core will then write parameter values into the log.
+
 # Running tests
 
 Run all tests

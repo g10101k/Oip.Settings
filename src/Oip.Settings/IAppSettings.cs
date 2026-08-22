@@ -1,4 +1,4 @@
-using Oip.Settings.Enums;
+﻿using Oip.Settings.Models;
 
 namespace Oip.Settings;
 
@@ -8,19 +8,11 @@ namespace Oip.Settings;
 public interface IAppSettings
 {
     /// <summary>
-    /// Connection string in DevExpress format
+    /// Connection string in DevExpress format, parsed into a model:
+    /// provider, custom parameters and connection string without them.
+    /// Bound from a plain string in configuration.
     /// </summary>
-    string ConnectionString { get; set; }
-
-    /// <summary>
-    /// Connection string without XpoProvider
-    /// </summary>
-    string NormalizedConnectionString { get; set; }
-
-    /// <summary>
-    /// Provider
-    /// </summary>
-    XpoProvider Provider { get; set; }
+    ConnectionModel ConnectionString { get; set; }
 
     /// <summary>
     /// Options to config application settings

@@ -17,11 +17,25 @@ public class AppSettingsContext : DbContext
     /// Initializes a new instance of the AppSettingsContext
     /// </summary>
     /// <param name="appSettings">Configuration options for application settings</param>
-    public AppSettingsContext(IAppSettings appSettings) : base(
-        appSettings.AppSettingsOptions.Builder(appSettings.Provider, appSettings.NormalizedConnectionString).Options)
+    public AppSettingsContext(IAppSettings appSettings) : base(BuildOptions(appSettings))
     {
         _appSettings = appSettings;
         _appSettingsOptions = appSettings.AppSettingsOptions;
+    }
+
+    /// <summary>
+    /// Builds context options and applies custom connection string parameters,
+    /// such as <c>SensitiveDataLogging</c>
+    /// </summary>
+    private static DbContextOptions<AppSettingsContext> BuildOptions(IAppSettings appSettings)
+    {
+        var builder = appSettings.AppSettingsOptions.Builder(appSettings.ConnectionString.Provider,
+            appSettings.ConnectionString.NormalizeConnectionString);
+
+        if (appSettings.ConnectionString.SensitiveDataLogging)
+            builder.EnableSensitiveDataLogging();
+
+        return builder.Options;
     }
 
     /// <summary>

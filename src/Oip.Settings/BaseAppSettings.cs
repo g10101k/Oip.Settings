@@ -1,4 +1,4 @@
-using Mcrio.Configuration.Provider.Docker.Secrets;
+﻿using Mcrio.Configuration.Provider.Docker.Secrets;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -7,6 +7,7 @@ using Oip.Settings.Attributes;
 using Oip.Settings.Contexts;
 using Oip.Settings.Enums;
 using Oip.Settings.Helpers;
+using Oip.Settings.Models;
 using Oip.Settings.Providers;
 
 // ReSharper disable PossibleMultipleWriteAccessInDoubleCheckLocking
@@ -66,15 +67,7 @@ public class BaseAppSettings<TAppSettings> : IAppSettings where TAppSettings : c
 
     /// <inheritdoc />
     [NotSaveToDb]
-    public string ConnectionString { get; set; } = null!;
-
-    /// <inheritdoc />
-    [NotSaveToDb]
-    public string NormalizedConnectionString { get; set; } = null!;
-
-    /// <inheritdoc />
-    [NotSaveToDb]
-    public XpoProvider Provider { get; set; } = XpoProvider.InMemoryDataStore;
+    public ConnectionModel ConnectionString { get; set; } = new();
 
     /// <summary>
     /// ASP.NET Core hosting environment name from ASPNETCORE_ENVIRONMENT.
@@ -205,18 +198,23 @@ public class BaseAppSettings<TAppSettings> : IAppSettings where TAppSettings : c
         SetIfNotNull(jsonFileName, value => _appSettingsOptions.JsonFileName = value);
         SetIfNotNull(jsonFileNameDevelopment, value => _appSettingsOptions.JsonFileNameDevelopment = value);
         SetIfNotNull(programArguments, value => _appSettingsOptions.ProgramArguments = value);
-        SetIfNotNull(useEfCoreProvider, value => _appSettingsOptions.UseEfCoreProvider = value.Value);
+        SetIfNotNull(useEfCoreProvider, value => _appSettingsOptions.UseEfCoreProvider = value);
         SetIfNotNull(appSettingsTable, value => _appSettingsOptions.AppSettingsTable = value);
         SetIfNotNull(appSettingsSchema, value => _appSettingsOptions.AppSettingsSchema = value);
         SetIfNotNull(builder, value => _appSettingsOptions.Builder = value);
-        SetIfNotNull(normalizeConnectionString, value => _appSettingsOptions.NormalizeConnectionString = value.Value);
+        SetIfNotNull(normalizeConnectionString, value => _appSettingsOptions.NormalizeConnectionString = value);
 
         return Instance;
     }
 
-    private static void SetIfNotNull<T>(T? value, Action<T> setter)
+    private static void SetIfNotNull<T>(T? value, Action<T> setter) where T : class
     {
         if (value != null) setter(value);
+    }
+
+    private static void SetIfNotNull<T>(T? value, Action<T> setter) where T : struct
+    {
+        if (value.HasValue) setter(value.Value);
     }
 
     private static T CreateInstance<T>() where T : class
@@ -242,7 +240,7 @@ public class BaseAppSettings<TAppSettings> : IAppSettings where TAppSettings : c
         var configurationBuilder = new ConfigurationBuilder();
 
         if (temporaryInstance.AppSettingsOptions.UseEfCoreProvider &&
-            !string.IsNullOrEmpty(temporaryInstance.ConnectionString))
+            !string.IsNullOrEmpty(temporaryInstance.ConnectionString.ConnectionString))
         {
             var efConfigurationSource = new EfConfigurationSource<TAppSettings>(
                 temporaryInstance.AppSettingsOptions, temporaryInstance);
@@ -280,24 +278,45 @@ public class BaseAppSettings<TAppSettings> : IAppSettings where TAppSettings : c
 
     internal static void BindConfiguration(IConfiguration configuration, TAppSettings instance)
     {
+        // binding replaces the whole model, so parameters configured on the instance are kept aside
+        var provider = instance.ConnectionString?.Provider ?? XpoProvider.InMemoryDataStore;
+        var sensitiveDataLogging = instance.ConnectionString?.SensitiveDataLogging ?? false;
+
         configuration.Bind(instance);
-        NormalizeConnectionString(instance);
+
+        NormalizeConnectionString(instance, provider, sensitiveDataLogging);
     }
 
-    internal static void NormalizeConnectionString(TAppSettings instance)
+    internal static void NormalizeConnectionString(TAppSettings instance, XpoProvider provider = XpoProvider.InMemoryDataStore,
+        bool sensitiveDataLogging = false)
     {
-        if (string.IsNullOrEmpty(instance.ConnectionString))
-            return;
+        var connectionString = instance.ConnectionString?.ConnectionString;
 
-        instance.NormalizedConnectionString = instance.ConnectionString;
-
-        if (!instance.AppSettingsOptions.NormalizeConnectionString)
+        if (string.IsNullOrEmpty(connectionString))
         {
+            instance.ConnectionString = new ConnectionModel
+            {
+                Provider = provider,
+                SensitiveDataLogging = sensitiveDataLogging,
+                ConnectionString = string.Empty,
+                NormalizeConnectionString = string.Empty
+            };
             return;
         }
 
-        var connectionModel = ConnectionStringHelper.NormalizeConnectionString(instance.ConnectionString);
-        instance.NormalizedConnectionString = connectionModel.NormalizeConnectionString;
-        instance.Provider = connectionModel.Provider;
+        if (!instance.AppSettingsOptions.NormalizeConnectionString)
+        {
+            // custom parameters are not cut off, provider is the one configured on the instance
+            instance.ConnectionString = new ConnectionModel
+            {
+                Provider = provider,
+                SensitiveDataLogging = sensitiveDataLogging,
+                ConnectionString = connectionString!,
+                NormalizeConnectionString = connectionString!
+            };
+            return;
+        }
+
+        instance.ConnectionString = ConnectionStringHelper.NormalizeConnectionString(connectionString!);
     }
 }
