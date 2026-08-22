@@ -1,6 +1,6 @@
 using Oip.Settings.Tests.Settings;
 
-namespace Oip.Settings.Tests;
+namespace Oip.Settings.Tests.Common;
 
 public class BaseSettingsTest
 {

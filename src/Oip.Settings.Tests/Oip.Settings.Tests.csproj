@@ -17,31 +17,19 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Using Include="NUnit.Framework"/>
+        <Using Include="NUnit.Framework" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Oip.Settings\Oip.Settings.csproj"/>
+        <ProjectReference Include="..\Oip.Settings\Oip.Settings.csproj" />
     </ItemGroup>
     
     <ItemGroup>
-      <None Update="appsettings.json">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="appsettings-normalize.json">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="appsettings-pg.json">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="appsettings-sql-server.json">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="appsettings-sqlite.json">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="appsettings.Development.json">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
+      <None Update="appsettings.json" CopyToOutputDirectory="PreserveNewest"/>
+      <None Update="appsettings.Development.json" CopyToOutputDirectory="PreserveNewest"/>
+      <None Update="appsettings-normalize.json" CopyToOutputDirectory="PreserveNewest"/>
+      <None Update="appsettings-pg.json" CopyToOutputDirectory="PreserveNewest"/>
+      <None Update="appsettings-sql-server.json" CopyToOutputDirectory="PreserveNewest"/>
+      <None Update="appsettings-sqlite.json" CopyToOutputDirectory="PreserveNewest"/>
     </ItemGroup>
 </Project>

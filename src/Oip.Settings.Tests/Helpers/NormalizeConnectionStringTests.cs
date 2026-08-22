@@ -2,7 +2,7 @@ using Oip.Settings.Enums;
 using Oip.Settings.Helpers;
 using Oip.Settings.Tests.Settings;
 
-namespace Oip.Settings.Tests;
+namespace Oip.Settings.Tests.Helpers;
 
 [TestFixture]
 public class NormalizeConnectionStringTests
