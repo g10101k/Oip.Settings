@@ -2,7 +2,7 @@ using System.Globalization;
 using Oip.Settings.Attributes;
 using Oip.Settings.Helpers;
 
-namespace Oip.Settings.Tests;
+namespace Oip.Settings.Tests.Helpers;
 
 [TestFixture]
 public class FatterTests

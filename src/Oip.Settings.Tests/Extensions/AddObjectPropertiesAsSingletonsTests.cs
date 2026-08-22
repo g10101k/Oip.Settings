@@ -1,7 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Oip.Settings.Attributes;
 
-namespace Oip.Settings.Tests;
+namespace Oip.Settings.Tests.Extensions;
 
 [TestFixture]
 public class AddObjectPropertiesAsSingletonsTests

@@ -1,17 +1,18 @@
 using Oip.Settings.Helpers;
+using Oip.Settings.Tests.Common;
 using Oip.Settings.Tests.Settings;
 
-namespace Oip.Settings.Tests;
+namespace Oip.Settings.Tests.Integration;
 
 /// <summary>
 /// Test fixture for SQLite settings configuration
 /// </summary>
 [TestFixture(true, "appsettings-sqlite.json")]
 [TestFixture(false, "appsettings-sqlite.json")]
-[TestFixture(true, "appsettings-sql-server.json")]
-[TestFixture(false, "appsettings-sql-server.json")]
-[TestFixture(true, "appsettings-pg.json")]
-[TestFixture(false, "appsettings-pg.json")]
+[TestFixture(true, "appsettings-sql-server.json", Category = TestCategories.Integration)]
+[TestFixture(false, "appsettings-sql-server.json", Category = TestCategories.Integration)]
+[TestFixture(true, "appsettings-pg.json", Category = TestCategories.Integration)]
+[TestFixture(false, "appsettings-pg.json", Category = TestCategories.Integration)]
 public class EfCoreProviderSettingsTest(bool useJsonStorage, string appSettingsJson) : BaseSettingsTest
 {
     private const string DevelopmentSettingsFile = "appsettings.json";
