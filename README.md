@@ -40,3 +40,35 @@ public class Program
     }
 }
 ````
+
+# Connection string as a model
+
+`ConnectionString` is written as a plain string in `appsettings.json`, but is available in code as a
+`ConnectionModel`:
+
+````json
+{
+  "ConnectionString": "XpoProvider=SQLite;Data Source=settings.db"
+}
+````
+
+````csharp
+AppSettings.Instance.Connection.Provider;                 // XpoProvider.SQLite
+AppSettings.Instance.Connection.NormalizeConnectionString; // Data Source=settings.db
+AppSettings.Instance.Connection.ConnectionString;          // XpoProvider=SQLite;Data Source=settings.db
+````
+
+`ConnectionModel` has a `TypeConverter`, so any own property of this type is bound from a plain string too:
+
+````csharp
+public class AppSettings : BaseAppSettings<AppSettings>
+{
+    public ConnectionModel ReportConnection { get; set; } = default!;
+}
+````
+
+````json
+{
+  "ReportConnection": "XpoProvider=Postgres;Server=localhost;Database=report;"
+}
+````

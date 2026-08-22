@@ -25,12 +25,22 @@ public static class ConnectionStringHelper
 
         if (matches.Count == 0)
         {
-            return new ConnectionModel { Provider = provider, NormalizeConnectionString = connectionString };
+            return new ConnectionModel
+            {
+                Provider = provider,
+                NormalizeConnectionString = connectionString,
+                ConnectionString = connectionString
+            };
         }
 
-        connectionString = connectionString.Replace(matches[0].Value, string.Empty);
+        var normalized = connectionString.Replace(matches[0].Value, string.Empty);
         provider = (XpoProvider)Enum.Parse(typeof(XpoProvider), matches[0].Groups[1].Value);
 
-        return new ConnectionModel { Provider = provider, NormalizeConnectionString = connectionString };
+        return new ConnectionModel
+        {
+            Provider = provider,
+            NormalizeConnectionString = normalized,
+            ConnectionString = connectionString
+        };
     }
 }

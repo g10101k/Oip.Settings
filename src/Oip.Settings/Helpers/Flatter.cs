@@ -1,4 +1,5 @@
-using System.Collections;
+﻿using System.Collections;
+using System.ComponentModel;
 using System.Globalization;
 using System.Reflection;
 using Oip.Settings.Attributes;
@@ -168,6 +169,18 @@ public static class Flatter
                type == typeof(DateTime) ||
                type == typeof(DateTimeOffset) ||
                type == typeof(TimeSpan) ||
-               type == typeof(Guid);
+               type == typeof(Guid) ||
+               HasStringTypeConverter(type);
+    }
+
+    /// <summary>
+    /// Determines if the type can be stored as a plain string, like <see cref="Oip.Settings.Models.ConnectionModel"/>
+    /// </summary>
+    /// <param name="type">Type to check</param>
+    /// <returns>True when the type has a two way string type converter</returns>
+    private static bool HasStringTypeConverter(Type type)
+    {
+        var converter = TypeDescriptor.GetConverter(type);
+        return converter.CanConvertFrom(typeof(string)) && converter.CanConvertTo(typeof(string));
     }
 }

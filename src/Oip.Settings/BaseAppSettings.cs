@@ -1,4 +1,4 @@
-using Mcrio.Configuration.Provider.Docker.Secrets;
+﻿using Mcrio.Configuration.Provider.Docker.Secrets;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -7,6 +7,7 @@ using Oip.Settings.Attributes;
 using Oip.Settings.Contexts;
 using Oip.Settings.Enums;
 using Oip.Settings.Helpers;
+using Oip.Settings.Models;
 using Oip.Settings.Providers;
 
 // ReSharper disable PossibleMultipleWriteAccessInDoubleCheckLocking
@@ -75,6 +76,15 @@ public class BaseAppSettings<TAppSettings> : IAppSettings where TAppSettings : c
     /// <inheritdoc />
     [NotSaveToDb]
     public XpoProvider Provider { get; set; } = XpoProvider.InMemoryDataStore;
+
+    /// <inheritdoc />
+    [NotSaveToDb]
+    public ConnectionModel Connection { get; set; } = new()
+    {
+        Provider = XpoProvider.InMemoryDataStore,
+        ConnectionString = string.Empty,
+        NormalizeConnectionString = string.Empty
+    };
 
     /// <summary>
     /// ASP.NET Core hosting environment name from ASPNETCORE_ENVIRONMENT.
@@ -293,11 +303,18 @@ public class BaseAppSettings<TAppSettings> : IAppSettings where TAppSettings : c
 
         if (!instance.AppSettingsOptions.NormalizeConnectionString)
         {
+            instance.Connection = new ConnectionModel
+            {
+                Provider = instance.Provider,
+                ConnectionString = instance.ConnectionString,
+                NormalizeConnectionString = instance.ConnectionString
+            };
             return;
         }
 
         var connectionModel = ConnectionStringHelper.NormalizeConnectionString(instance.ConnectionString);
         instance.NormalizedConnectionString = connectionModel.NormalizeConnectionString;
         instance.Provider = connectionModel.Provider;
+        instance.Connection = connectionModel;
     }
 }
