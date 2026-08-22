@@ -198,18 +198,23 @@ public class BaseAppSettings<TAppSettings> : IAppSettings where TAppSettings : c
         SetIfNotNull(jsonFileName, value => _appSettingsOptions.JsonFileName = value);
         SetIfNotNull(jsonFileNameDevelopment, value => _appSettingsOptions.JsonFileNameDevelopment = value);
         SetIfNotNull(programArguments, value => _appSettingsOptions.ProgramArguments = value);
-        SetIfNotNull(useEfCoreProvider, value => _appSettingsOptions.UseEfCoreProvider = value.Value);
+        SetIfNotNull(useEfCoreProvider, value => _appSettingsOptions.UseEfCoreProvider = value);
         SetIfNotNull(appSettingsTable, value => _appSettingsOptions.AppSettingsTable = value);
         SetIfNotNull(appSettingsSchema, value => _appSettingsOptions.AppSettingsSchema = value);
         SetIfNotNull(builder, value => _appSettingsOptions.Builder = value);
-        SetIfNotNull(normalizeConnectionString, value => _appSettingsOptions.NormalizeConnectionString = value.Value);
+        SetIfNotNull(normalizeConnectionString, value => _appSettingsOptions.NormalizeConnectionString = value);
 
         return Instance;
     }
 
-    private static void SetIfNotNull<T>(T? value, Action<T> setter)
+    private static void SetIfNotNull<T>(T? value, Action<T> setter) where T : class
     {
         if (value != null) setter(value);
+    }
+
+    private static void SetIfNotNull<T>(T? value, Action<T> setter) where T : struct
+    {
+        if (value.HasValue) setter(value.Value);
     }
 
     private static T CreateInstance<T>() where T : class
