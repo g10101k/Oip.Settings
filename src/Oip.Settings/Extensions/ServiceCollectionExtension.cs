@@ -25,19 +25,19 @@ public static class ServiceCollectionExtension
         {
             return services.AddDbContext<AppSettingsContext>(option =>
             {
-                switch (appSettings.Provider)
+                switch (appSettings.Connection.Provider)
                 {
                     case XpoProvider.SQLite:
-                        option.UseSqlite(appSettings.NormalizedConnectionString);
+                        option.UseSqlite(appSettings.Connection.NormalizeConnectionString);
                         break;
                     case XpoProvider.Postgres:
-                        option.UseNpgsql(appSettings.NormalizedConnectionString);
+                        option.UseNpgsql(appSettings.Connection.NormalizeConnectionString);
                         break;
                     case XpoProvider.MSSqlServer:
-                        option.UseSqlServer(appSettings.NormalizedConnectionString);
+                        option.UseSqlServer(appSettings.Connection.NormalizeConnectionString);
                         break;
                     case XpoProvider.InMemoryDataStore:
-                        option.UseInMemoryDatabase(appSettings.NormalizedConnectionString);
+                        option.UseInMemoryDatabase(appSettings.Connection.NormalizeConnectionString);
                         break;
                     default:
                         throw new InvalidOperationException("Unknown provider");

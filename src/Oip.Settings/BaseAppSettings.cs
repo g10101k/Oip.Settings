@@ -71,20 +71,7 @@ public class BaseAppSettings<TAppSettings> : IAppSettings where TAppSettings : c
 
     /// <inheritdoc />
     [NotSaveToDb]
-    public string NormalizedConnectionString { get; set; } = null!;
-
-    /// <inheritdoc />
-    [NotSaveToDb]
-    public XpoProvider Provider { get; set; } = XpoProvider.InMemoryDataStore;
-
-    /// <inheritdoc />
-    [NotSaveToDb]
-    public ConnectionModel Connection { get; set; } = new()
-    {
-        Provider = XpoProvider.InMemoryDataStore,
-        ConnectionString = string.Empty,
-        NormalizeConnectionString = string.Empty
-    };
+    public ConnectionModel Connection { get; set; } = new();
 
     /// <summary>
     /// ASP.NET Core hosting environment name from ASPNETCORE_ENVIRONMENT.
@@ -299,22 +286,19 @@ public class BaseAppSettings<TAppSettings> : IAppSettings where TAppSettings : c
         if (string.IsNullOrEmpty(instance.ConnectionString))
             return;
 
-        instance.NormalizedConnectionString = instance.ConnectionString;
-
         if (!instance.AppSettingsOptions.NormalizeConnectionString)
         {
+            // keep the provider and custom parameters configured on the instance itself
             instance.Connection = new ConnectionModel
             {
-                Provider = instance.Provider,
+                Provider = instance.Connection.Provider,
+                SensitiveDataLogging = instance.Connection.SensitiveDataLogging,
                 ConnectionString = instance.ConnectionString,
                 NormalizeConnectionString = instance.ConnectionString
             };
             return;
         }
 
-        var connectionModel = ConnectionStringHelper.NormalizeConnectionString(instance.ConnectionString);
-        instance.NormalizedConnectionString = connectionModel.NormalizeConnectionString;
-        instance.Provider = connectionModel.Provider;
-        instance.Connection = connectionModel;
+        instance.Connection = ConnectionStringHelper.NormalizeConnectionString(instance.ConnectionString);
     }
 }
