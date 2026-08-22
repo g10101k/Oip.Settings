@@ -8,15 +8,11 @@ namespace Oip.Settings;
 public interface IAppSettings
 {
     /// <summary>
-    /// Connection string in DevExpress format
+    /// Connection string in DevExpress format, parsed into a model:
+    /// provider, custom parameters and connection string without them.
+    /// Bound from a plain string in configuration.
     /// </summary>
-    string ConnectionString { get; set; }
-
-    /// <summary>
-    /// Connection string parsed into a model: provider, custom parameters
-    /// and connection string without them
-    /// </summary>
-    ConnectionModel Connection { get; set; }
+    ConnectionModel ConnectionString { get; set; }
 
     /// <summary>
     /// Options to config application settings

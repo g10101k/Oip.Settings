@@ -49,8 +49,8 @@ public class JsonAppSettingsTests : BaseSettingsTest
     public void BindConfig_ShouldBindCorrectly()
     {
         var settings = JsonTestAppSettings.Instance;
-        Assert.That(settings.ConnectionString, Is.Null);
-        Assert.That(settings.Connection.NormalizeConnectionString, Is.Empty);
+        Assert.That(settings.ConnectionString.ConnectionString, Is.Empty);
+        Assert.That(settings.ConnectionString.NormalizeConnectionString, Is.Empty);
     }
 
     /// <summary>
@@ -63,8 +63,8 @@ public class JsonAppSettingsTests : BaseSettingsTest
         var settings = JsonTestAppSettings.Instance;
 
         // Assert
-        Assert.That(settings.Connection.Provider, Is.EqualTo(XpoProvider.InMemoryDataStore));
-        Assert.That(settings.Connection.NormalizeConnectionString, Is.Empty);
+        Assert.That(settings.ConnectionString.Provider, Is.EqualTo(XpoProvider.InMemoryDataStore));
+        Assert.That(settings.ConnectionString.NormalizeConnectionString, Is.Empty);
     }
 
     /// <summary>

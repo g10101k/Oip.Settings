@@ -53,14 +53,14 @@ public class Program
 ````
 
 ````csharp
-AppSettings.Instance.Connection.Provider;                  // XpoProvider.SQLite
-AppSettings.Instance.Connection.NormalizeConnectionString; // Data Source=settings.db
-AppSettings.Instance.Connection.ConnectionString;          // XpoProvider=SQLite;Data Source=settings.db
+AppSettings.Instance.ConnectionString.Provider;                  // XpoProvider.SQLite
+AppSettings.Instance.ConnectionString.NormalizeConnectionString; // Data Source=settings.db
+AppSettings.Instance.ConnectionString.ConnectionString;          // XpoProvider=SQLite;Data Source=settings.db
 ````
 
-`Connection` is the single place where the parsed connection string lives. The former top level
-`AppSettings.Instance.Provider` and `AppSettings.Instance.NormalizedConnectionString` properties are removed,
-use `Connection.Provider` and `Connection.NormalizeConnectionString` instead.
+`ConnectionString` is typed as `ConnectionModel` and is the single place where the parsed connection string lives.
+The former `Provider`, `NormalizedConnectionString` and `Connection` properties are removed, use
+`ConnectionString.Provider` and `ConnectionString.NormalizeConnectionString` instead.
 
 `ConnectionModel` has a `TypeConverter`, so any own property of this type is bound from a plain string too:
 
@@ -89,8 +89,8 @@ the normalized connection string and turns on EF Core sensitive data logging for
 ````
 
 ````csharp
-AppSettings.Instance.Connection.SensitiveDataLogging;      // true
-AppSettings.Instance.Connection.NormalizeConnectionString; // Data Source=settings.db
+AppSettings.Instance.ConnectionString.SensitiveDataLogging;      // true
+AppSettings.Instance.ConnectionString.NormalizeConnectionString; // Data Source=settings.db
 ````
 
 Do not enable it in production: EF Core will then write parameter values into the log.

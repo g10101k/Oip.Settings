@@ -21,7 +21,38 @@ public class NormalizeConnectionStringTests
 
         // Assert
         Assert.That(instance, Is.Not.Null);
-        Assert.That(instance.Connection.NormalizeConnectionString, Is.EqualTo(instance.ConnectionString));
+        Assert.That(instance.ConnectionString.NormalizeConnectionString,
+            Is.EqualTo(instance.ConnectionString.ConnectionString));
+    }
+
+    [Test]
+    public void NormalizeConnectionString_WhenDisabled_KeepsCustomParametersInConnectionString()
+    {
+        // Arrange
+        var options = new AppSettingsOptions
+        {
+            NormalizeConnectionString = false,
+            UseEfCoreProvider = false
+        };
+
+        // Act
+        var instance = NoNormalizeCustomParametersTestAppSettings.Initialize(options);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            // the connection string is passed through untouched, XpoProvider and SensitiveDataLogging are not cut off
+            Assert.That(instance.ConnectionString.NormalizeConnectionString,
+                Is.EqualTo(NoNormalizeCustomParametersTestAppSettings.RawConnectionString));
+            Assert.That(instance.ConnectionString.ConnectionString,
+                Is.EqualTo(NoNormalizeCustomParametersTestAppSettings.RawConnectionString));
+
+            // the provider configured on the instance wins over the one written in the connection string
+            Assert.That(instance.ConnectionString.Provider, Is.EqualTo(XpoProvider.MSSqlServer));
+
+            // custom parameters are still recognized, they are just not removed from the connection string
+            Assert.That(instance.ConnectionString.SensitiveDataLogging, Is.True);
+        });
     }
 
     [TestCase("XpoProvider=InMemoryDataStore;", XpoProvider.InMemoryDataStore)]
@@ -132,9 +163,9 @@ public class NormalizeConnectionStringTests
 
         public NoNormalizeCustomParametersTestAppSettings()
         {
-            // provider is configured explicitly, it is not taken from the connection string in this mode
-            Connection.Provider = XpoProvider.MSSqlServer;
             ConnectionString = RawConnectionString;
+            // provider is configured explicitly, it is not taken from the connection string in this mode
+            ConnectionString.Provider = XpoProvider.MSSqlServer;
         }
     }
 
@@ -146,8 +177,8 @@ public class NormalizeConnectionStringTests
     {
         public NormalizeConnectionStringFalseTestAppSettings()
         {
-            Connection.Provider = XpoProvider.InMemoryDataStore;
             ConnectionString = Guid.NewGuid().ToString();
+            ConnectionString.Provider = XpoProvider.InMemoryDataStore;
         }
 
         /// <inheritdoc />

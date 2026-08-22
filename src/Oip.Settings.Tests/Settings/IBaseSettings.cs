@@ -6,11 +6,6 @@ namespace Oip.Settings.Tests.Settings;
 public interface IBaseSettings
 {
     /// <summary>
-    /// Gets or sets the connection string.
-    /// </summary>
-    string ConnectionString { get; set; }
-
-    /// <summary>
     /// Gets or sets a test integer value.
     /// </summary>
     int TestInt { get; set; }

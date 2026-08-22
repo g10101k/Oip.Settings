@@ -67,11 +67,7 @@ public class BaseAppSettings<TAppSettings> : IAppSettings where TAppSettings : c
 
     /// <inheritdoc />
     [NotSaveToDb]
-    public string ConnectionString { get; set; } = null!;
-
-    /// <inheritdoc />
-    [NotSaveToDb]
-    public ConnectionModel Connection { get; set; } = new();
+    public ConnectionModel ConnectionString { get; set; } = new();
 
     /// <summary>
     /// ASP.NET Core hosting environment name from ASPNETCORE_ENVIRONMENT.
@@ -239,7 +235,7 @@ public class BaseAppSettings<TAppSettings> : IAppSettings where TAppSettings : c
         var configurationBuilder = new ConfigurationBuilder();
 
         if (temporaryInstance.AppSettingsOptions.UseEfCoreProvider &&
-            !string.IsNullOrEmpty(temporaryInstance.ConnectionString))
+            !string.IsNullOrEmpty(temporaryInstance.ConnectionString.ConnectionString))
         {
             var efConfigurationSource = new EfConfigurationSource<TAppSettings>(
                 temporaryInstance.AppSettingsOptions, temporaryInstance);
@@ -277,28 +273,45 @@ public class BaseAppSettings<TAppSettings> : IAppSettings where TAppSettings : c
 
     internal static void BindConfiguration(IConfiguration configuration, TAppSettings instance)
     {
+        // binding replaces the whole model, so parameters configured on the instance are kept aside
+        var provider = instance.ConnectionString?.Provider ?? XpoProvider.InMemoryDataStore;
+        var sensitiveDataLogging = instance.ConnectionString?.SensitiveDataLogging ?? false;
+
         configuration.Bind(instance);
-        NormalizeConnectionString(instance);
+
+        NormalizeConnectionString(instance, provider, sensitiveDataLogging);
     }
 
-    internal static void NormalizeConnectionString(TAppSettings instance)
+    internal static void NormalizeConnectionString(TAppSettings instance, XpoProvider provider = XpoProvider.InMemoryDataStore,
+        bool sensitiveDataLogging = false)
     {
-        if (string.IsNullOrEmpty(instance.ConnectionString))
-            return;
+        var connectionString = instance.ConnectionString?.ConnectionString;
 
-        if (!instance.AppSettingsOptions.NormalizeConnectionString)
+        if (string.IsNullOrEmpty(connectionString))
         {
-            // keep the provider and custom parameters configured on the instance itself
-            instance.Connection = new ConnectionModel
+            instance.ConnectionString = new ConnectionModel
             {
-                Provider = instance.Connection.Provider,
-                SensitiveDataLogging = instance.Connection.SensitiveDataLogging,
-                ConnectionString = instance.ConnectionString,
-                NormalizeConnectionString = instance.ConnectionString
+                Provider = provider,
+                SensitiveDataLogging = sensitiveDataLogging,
+                ConnectionString = string.Empty,
+                NormalizeConnectionString = string.Empty
             };
             return;
         }
 
-        instance.Connection = ConnectionStringHelper.NormalizeConnectionString(instance.ConnectionString);
+        if (!instance.AppSettingsOptions.NormalizeConnectionString)
+        {
+            // custom parameters are not cut off, provider is the one configured on the instance
+            instance.ConnectionString = new ConnectionModel
+            {
+                Provider = provider,
+                SensitiveDataLogging = sensitiveDataLogging,
+                ConnectionString = connectionString!,
+                NormalizeConnectionString = connectionString!
+            };
+            return;
+        }
+
+        instance.ConnectionString = ConnectionStringHelper.NormalizeConnectionString(connectionString!);
     }
 }

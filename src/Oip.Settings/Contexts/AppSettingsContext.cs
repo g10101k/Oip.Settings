@@ -29,10 +29,10 @@ public class AppSettingsContext : DbContext
     /// </summary>
     private static DbContextOptions<AppSettingsContext> BuildOptions(IAppSettings appSettings)
     {
-        var builder = appSettings.AppSettingsOptions.Builder(appSettings.Connection.Provider,
-            appSettings.Connection.NormalizeConnectionString);
+        var builder = appSettings.AppSettingsOptions.Builder(appSettings.ConnectionString.Provider,
+            appSettings.ConnectionString.NormalizeConnectionString);
 
-        if (appSettings.Connection.SensitiveDataLogging)
+        if (appSettings.ConnectionString.SensitiveDataLogging)
             builder.EnableSensitiveDataLogging();
 
         return builder.Options;

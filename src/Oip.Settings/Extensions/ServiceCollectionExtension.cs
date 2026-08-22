@@ -1,7 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Oip.Settings;
+﻿using Oip.Settings;
 using Oip.Settings.Contexts;
-using Oip.Settings.Enums;
 using System.Reflection;
 using Oip.Settings.Attributes;
 
@@ -14,69 +12,65 @@ namespace Microsoft.Extensions.DependencyInjection;
 public static class ServiceCollectionExtension
 {
     /// <summary>
-    /// IServiceCollection extension
+    /// Registers <see cref="AppSettingsContext"/> as a scoped service.
+    /// The context is configured from <see cref="AppSettingsOptions.Builder"/>,
+    /// so the provider and connection string come from <paramref name="appSettings"/>.
     /// </summary>
-    extension(IServiceCollection services)
+    public static IServiceCollection AddAppSettingsDbContext(this IServiceCollection services, IAppSettings appSettings)
     {
-        /// <summary>
-        /// Adds AppSettings context and registers complex properties of <see cref="IAppSettings"/>.
-        /// </summary>
-        public IServiceCollection AddAppSettingsDbContext(IAppSettings appSettings)
+        ArgumentNullException.ThrowIfNull(appSettings);
+
+        services.AddScoped(_ => new AppSettingsContext(appSettings));
+
+        return services;
+    }
+
+    /// <summary>
+    /// Registers the settings instance itself as a singleton under <typeparamref name="TAppSettings"/>
+    /// and then registers its complex properties.
+    /// </summary>
+    public static IServiceCollection AddSettingsToDependencyInjection<TAppSettings>(this IServiceCollection services, TAppSettings instance)
+        where TAppSettings : class, IAppSettings
+    {
+        if (instance == null)
+            throw new ArgumentNullException(nameof(instance));
+
+        services.AddSingleton(instance);
+
+        return services.AddSettingsToDependencyInjection((object)instance);
+    }
+
+    /// <summary>
+    /// Registers public object properties except simple types and properties marked with DoNotAddToDependencyInjection.
+    /// </summary>
+    public static IServiceCollection AddSettingsToDependencyInjection(this IServiceCollection services, object instance)
+    {
+        if (instance == null)
+            throw new ArgumentNullException(nameof(instance));
+
+        var props = instance.GetType()
+            .GetProperties(BindingFlags.Public | BindingFlags.Instance);
+
+        foreach (var prop in props)
         {
-            return services.AddDbContext<AppSettingsContext>(option =>
-            {
-                switch (appSettings.Connection.Provider)
-                {
-                    case XpoProvider.SQLite:
-                        option.UseSqlite(appSettings.Connection.NormalizeConnectionString);
-                        break;
-                    case XpoProvider.Postgres:
-                        option.UseNpgsql(appSettings.Connection.NormalizeConnectionString);
-                        break;
-                    case XpoProvider.MSSqlServer:
-                        option.UseSqlServer(appSettings.Connection.NormalizeConnectionString);
-                        break;
-                    case XpoProvider.InMemoryDataStore:
-                        option.UseInMemoryDatabase(appSettings.Connection.NormalizeConnectionString);
-                        break;
-                    default:
-                        throw new InvalidOperationException("Unknown provider");
-                }
-            });
+            if (!prop.CanRead)
+                continue;
+
+            // Skip properties marked with attribute
+            if (prop.GetCustomAttribute<NotAddToDependencyInjectionAttribute>() != null)
+                continue;
+
+            var value = prop.GetValue(instance);
+            if (value == null)
+                continue;
+
+            if (IsSimpleType(prop.PropertyType))
+                continue;
+
+            services.AddSingleton(prop.PropertyType, value);
         }
 
-        /// <summary>
-        /// Registers public object properties except simple types and properties marked with DoNotAddToDependencyInjection.
-        /// </summary>
-        public IServiceCollection AddSettingsToDependencyInjection(object instance)
-        {
-            if (instance == null)
-                throw new ArgumentNullException(nameof(instance));
-
-            var props = instance.GetType()
-                .GetProperties(BindingFlags.Public | BindingFlags.Instance);
-
-            foreach (var prop in props)
-            {
-                if (!prop.CanRead)
-                    continue;
-
-                // Skip properties marked with attribute
-                if (prop.GetCustomAttribute<NotAddToDependencyInjectionAttribute>() != null)
-                    continue;
-
-                var value = prop.GetValue(instance);
-                if (value == null)
-                    continue;
-
-                if (IsSimpleType(prop.PropertyType))
-                    continue;
-
-                services.AddSingleton(prop.PropertyType, value);
-            }
-
-            return services;
-        }
+        return services;
     }
 
     /// <summary>

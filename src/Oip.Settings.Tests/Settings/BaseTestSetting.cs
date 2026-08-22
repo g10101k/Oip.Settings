@@ -3,7 +3,9 @@ namespace Oip.Settings.Tests.Settings;
 /// <inheritdoc />
 public class BaseTestSetting : IBaseSettings
 {
-    /// <inheritdoc />
+    /// <summary>
+    /// Gets or sets the connection string.
+    /// </summary>
     public string ConnectionString { get; set; }
 
     /// <inheritdoc />

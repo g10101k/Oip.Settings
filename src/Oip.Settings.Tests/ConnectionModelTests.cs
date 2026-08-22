@@ -52,9 +52,10 @@ public class ConnectionModelTests
 
         Assert.Multiple(() =>
         {
-            Assert.That(settings.Connection.Provider, Is.EqualTo(XpoProvider.SQLite));
-            Assert.That(settings.Connection.NormalizeConnectionString, Is.EqualTo("Data Source=settings.db"));
-            Assert.That(settings.Connection.ConnectionString, Is.EqualTo(settings.ConnectionString));
+            Assert.That(settings.ConnectionString.Provider, Is.EqualTo(XpoProvider.SQLite));
+            Assert.That(settings.ConnectionString.NormalizeConnectionString, Is.EqualTo("Data Source=settings.db"));
+            Assert.That(settings.ConnectionString.ConnectionString,
+                Is.EqualTo("XpoProvider=SQLite;Data Source=settings.db"));
         });
     }
 
