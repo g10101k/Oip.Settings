@@ -12,16 +12,6 @@ public class AppSettingsOptions
     /// <summary>
     /// Program arguments for settings
     /// </summary>
-    [Obsolete("Will be removed in further releases. Use \"ProgramArguments\" instead")]
-    public string[] ProgrammeArguments
-    {
-        get => ProgramArguments;
-        set => ProgramArguments = value;
-    }
-
-    /// <summary>
-    /// Program arguments for settings
-    /// </summary>
     public string[] ProgramArguments { get; set; } = [];
 
     /// <summary>
@@ -39,35 +29,31 @@ public class AppSettingsOptions
     /// </summary>
     public bool ExcludeMigration { get; set; }
 
-    private string _appSettingsSchema = "settings";
-
     /// <summary>
     /// Table schema for save settings
     /// </summary>
     public string AppSettingsSchema
     {
-        get => _appSettingsSchema;
+        get;
         set
         {
-            _appSettingsSchema = value;
+            field = value;
             Environment.SetEnvironmentVariable(nameof(AppSettingsSchema), value);
         }
-    }
-
-    private string _appSettingsTable = "AppSetting";
+    } = "settings";
 
     /// <summary>
     /// Table name for application settings
     /// </summary>
     public string AppSettingsTable
     {
-        get => _appSettingsTable;
+        get;
         set
         {
-            _appSettingsTable = value;
+            field = value;
             Environment.SetEnvironmentVariable(nameof(AppSettingsTable), value);
         }
-    }
+    } = "AppSetting";
 
     /// <summary>
     /// DbContextOptionsBuilder
@@ -96,7 +82,6 @@ public class AppSettingsOptions
 
             return optionsBuilder;
         };
-
 
     /// <summary>
     /// Use EFCore settings provider, default - true
