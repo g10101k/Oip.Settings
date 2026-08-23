@@ -50,6 +50,13 @@ public class ConnectionModel
     public static implicit operator ConnectionModel(string connectionString) => Parse(connectionString);
 
     /// <summary>
+    /// Converts a <see cref="ConnectionModel"/> to the original connection string,
+    /// exactly as it was written in configuration, custom parameters included.
+    /// To open a connection use <see cref="NormalizeConnectionString"/> instead.
+    /// </summary>
+    public static implicit operator string(ConnectionModel? model) => model?.ToString() ?? string.Empty;
+
+    /// <summary>
     /// Returns the original connection string
     /// </summary>
     public override string ToString() => ConnectionString ?? NormalizeConnectionString ?? string.Empty;

@@ -59,6 +59,38 @@ public class ConnectionModelTests
         });
     }
 
+    /// <summary>
+    /// Test that a model is implicitly converted to the original connection string
+    /// </summary>
+    [Test]
+    public void ImplicitOperator_ShouldReturnOriginalConnectionString()
+    {
+        const string connectionString = "XpoProvider=SQLite;SensitiveDataLogging=true;Data Source=settings.db";
+        ConnectionModel model = connectionString;
+
+        string implicitValue = model;
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(implicitValue, Is.EqualTo(connectionString));
+            Assert.That(implicitValue, Is.EqualTo(model.ToString()));
+            Assert.That(model.NormalizeConnectionString, Is.EqualTo("Data Source=settings.db"));
+        });
+    }
+
+    /// <summary>
+    /// Test that a null model is converted to an empty string instead of throwing
+    /// </summary>
+    [Test]
+    public void ImplicitOperator_ShouldReturnEmptyStringForNull()
+    {
+        ConnectionModel nullModel = null!;
+
+        string implicitValue = nullModel;
+
+        Assert.That(implicitValue, Is.Empty);
+    }
+
     private class ConnectionModelTestSettings
     {
         public ConnectionModel? ReportConnection { get; set; }

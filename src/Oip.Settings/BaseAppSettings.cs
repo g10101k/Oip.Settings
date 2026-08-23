@@ -267,10 +267,10 @@ public class BaseAppSettings<TAppSettings> : IAppSettings where TAppSettings : c
             .SetBasePath(AppContext.BaseDirectory)
             .AddJsonFile(_appSettingsOptions.JsonFileName, optional: true, reloadOnChange: true)
             .AddJsonFile(_appSettingsOptions.JsonFileNameDevelopment, optional: true, reloadOnChange: true)
-            .AddUserSecrets<TAppSettings>()
-            .AddDockerSecrets()
             .AddSpaConfig()
             .AddModuleConfig()
+            .AddUserSecrets<TAppSettings>()
+            .AddDockerSecrets()
             .AddEnvironmentVariables()
             .AddCommandLine(_appSettingsOptions.ProgramArguments)
             .Build();
