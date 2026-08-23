@@ -1,3 +1,5 @@
+**English** | [Русский](README.ru.md)
+
 # Oip.Settings
 
 Application settings with an EF Core provider. Sources in order of priority:
@@ -75,6 +77,21 @@ public class AppSettings : BaseAppSettings<AppSettings>
 {
   "ReportConnection": "XpoProvider=Postgres;Server=localhost;Database=report;"
 }
+````
+
+The conversion works the other way too: `ConnectionModel` is implicitly converted to a string, so it can be
+passed anywhere a `string` is expected. The result is the original connection string, exactly as it was
+written in configuration, custom parameters included — the same value `ToString()` returns:
+
+````csharp
+string raw = AppSettings.Instance.ConnectionString; // XpoProvider=SQLite;Data Source=settings.db
+````
+
+To open a connection use `NormalizeConnectionString` explicitly — the implicit conversion keeps
+`XpoProvider=` and other custom parameters, which a database provider will not understand:
+
+````csharp
+optionsBuilder.UseSqlite(AppSettings.Instance.ConnectionString.NormalizeConnectionString);
 ````
 
 # Sensitive data logging
