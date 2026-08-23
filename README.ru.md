@@ -2,12 +2,18 @@
 
 # Oip.Settings
 
-Настройки приложения с провайдером EF Core и следующим приоритетом:
+Настройки приложения с провайдером EF Core. Источники перечислены по убыванию приоритета — каждый
+следующий перекрывается всеми предыдущими:
 
-* Аргумент командной строки
+* Аргументы командной строки
 * Переменные окружения
-* Json-файл
-* EF Core
+* Docker secrets
+* User secrets
+* `appsettings.modules.json` — конфигурация модулей, если файл существует
+* `spa.proxy.json` — конфигурация SPA-прокси, если файл существует
+* `appsettings.Development.json` — имя задаётся через `JsonFileNameDevelopment`
+* `appsettings.json` — имя задаётся через `JsonFileName`
+* EF Core — таблица настроек в БД, подключается при `UseEfCoreProvider = true`
 
 # Начало работы
 
@@ -64,38 +70,7 @@ AppSettings.Instance.ConnectionString.ConnectionString;          // XpoProvider=
 подключения. Прежние свойства `Provider`, `NormalizedConnectionString` и `Connection` удалены,
 используйте вместо них `ConnectionString.Provider` и `ConnectionString.NormalizeConnectionString`.
 
-У `ConnectionModel` есть `TypeConverter`, поэтому любое ваше собственное свойство этого типа тоже
-привязывается из обычной строки:
-
-````csharp
-public class AppSettings : BaseAppSettings<AppSettings>
-{
-    public ConnectionModel ReportConnection { get; set; } = default!;
-}
-````
-
-````json
-{
-  "ReportConnection": "XpoProvider=Postgres;Server=localhost;Database=report;"
-}
-````
-
-Преобразование работает и в обратную сторону: `ConnectionModel` неявно приводится к строке, поэтому его можно
-передавать туда, где ожидается `string`. Возвращается исходная строка подключения ровно в том виде, в каком она
-записана в конфигурации, вместе с собственными параметрами — то же значение, что и у `ToString()`:
-
-````csharp
-string raw = AppSettings.Instance.ConnectionString; // XpoProvider=SQLite;Data Source=settings.db
-````
-
-Для открытия соединения указывайте `NormalizeConnectionString` явно — неявное приведение сохраняет
-`XpoProvider=` и другие собственные параметры, которые провайдер БД не поймёт:
-
-````csharp
-optionsBuilder.UseSqlite(AppSettings.Instance.ConnectionString.NormalizeConnectionString);
-````
-
-# Логирование чувствительных данных
+## Логирование чувствительных данных
 
 `SensitiveDataLogging` — собственный параметр строки подключения, такой же как `XpoProvider`. Он вырезается из
 нормализованной строки подключения и включает логирование чувствительных данных EF Core для `DbContext` настроек:
@@ -112,6 +87,23 @@ AppSettings.Instance.ConnectionString.NormalizeConnectionString; // Data Source=
 ````
 
 Не включайте его в продакшене: EF Core начнёт записывать значения параметров в лог.
+
+## Обратное приведение модели к строке
+
+Преобразование работает и в обратную сторону: `ConnectionModel` неявно приводится к строке, поэтому его можно
+передавать туда, где ожидается `string`. Возвращается исходная строка подключения ровно в том виде, в каком она
+записана в конфигурации, вместе с собственными параметрами — то же значение, что и у `ToString()`:
+
+````csharp
+string raw = AppSettings.Instance.ConnectionString; // XpoProvider=SQLite;Data Source=settings.db
+````
+
+Для открытия соединения указывайте `NormalizeConnectionString` явно — неявное приведение сохраняет
+`XpoProvider=` и другие собственные параметры, которые провайдер БД не поймёт:
+
+````csharp
+optionsBuilder.UseSqlite(AppSettings.Instance.ConnectionString.NormalizeConnectionString);
+````
 
 # Параметры инициализации
 
@@ -139,10 +131,7 @@ AppSettings.Initialize(new AppSettingsOptions
 });
 ````
 
-Источники конфигурации подключаются в следующем порядке: json-файл, json-файл окружения, user secrets,
-docker secrets, `spa.proxy.json`, `appsettings.modules.json` (оба — если файл существует),
-переменные окружения, аргументы командной строки. Каждый следующий источник перекрывает
-предыдущий, а настройки из EF Core имеют наименьший приоритет.
+Полный список источников конфигурации и их приоритет приведены в начале справки.
 
 При `UseJsonStorage = false` (по умолчанию) настройки хранятся в таблице как плоские пары ключ-значение,
 при `UseJsonStorage = true` — одной записью, где ключ равен полному имени типа настроек, а значение — json.
