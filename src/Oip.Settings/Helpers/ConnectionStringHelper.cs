@@ -40,13 +40,8 @@ public static class ConnectionStringHelper
         var provider = XpoProvider.InMemoryDataStore;
         if (TryExtractParameter(normalized, XpoProviderParameter, out var providerValue, out normalized))
         {
-#if NET6_0_OR_GREATER
             if (Enum.TryParse<XpoProvider>(providerValue, true, out var parsedProvider))
                 provider = parsedProvider;
-#else
-            if (Enum.TryParse(providerValue, true, out XpoProvider parsedProvider))
-                provider = parsedProvider;
-#endif
         }
 
         var sensitiveDataLogging = false;

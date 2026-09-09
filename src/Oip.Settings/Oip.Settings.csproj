@@ -1,11 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>net6.0;net8.0</TargetFrameworks>
+        <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <LangVersion>latest</LangVersion>
-        <Version>2.0.1</Version>
+        <Version>3.0.0</Version>
     </PropertyGroup>
 
     <PropertyGroup>
@@ -31,35 +31,19 @@
         <None Include="..\..\README.md" Pack="true" PackagePath="\"/>
     </ItemGroup>
 
-    <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
-        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.36"/>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.36"/>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="6.0.36"/>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.36"/>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.36"/>
-        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="6.0.29"/>
-        <PackageReference Include="Microsoft.Extensions.Configuration" Version="6.0.2"/>
-        <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="6.0.1"/>
-        <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="6.0.1"/>
-        <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="6.0.2"/>
-        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.1"/>
-        <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="6.0.2"/>
-        <PackageReference Include="Mcrio.Configuration.Provider.Docker.Secrets" Version="1.0.1" />
-    </ItemGroup>
-
-    <ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
-        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.22"/>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.22"/>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.22"/>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.22"/>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.22"/>
-        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.11"/>
-        <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0"/>
-        <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="8.0.2"/>
-        <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="8.0.0"/>
-        <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="8.0.0"/>
-        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.1"/>
-        <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="8.0.1"/>
+    <ItemGroup>
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.12"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.12"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="10.0.12"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.12"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.12"/>
+        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3"/>
+        <PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.12"/>
+        <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="10.0.12"/>
+        <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="10.0.12"/>
+        <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="10.0.12"/>
+        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.12"/>
+        <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="10.0.12"/>
         <PackageReference Include="Mcrio.Configuration.Provider.Docker.Secrets" Version="1.0.1" />
     </ItemGroup>
 
